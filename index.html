@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استبيان التسويق الاخضر - تسالة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="day-mode">
+    <div id="world-container">
+        <!-- 3D Background Canvas -->
+        <canvas id="bg-canvas"></canvas>
+
+        <!-- CSS Background Elements (Fallback/Overlay) -->
+        <div class="sky-gradient"></div>
+        <div class="sun-moon"></div>
+        <div class="forest-bg"></div>
+        <div class="particles"></div>
+
+        <!-- Theme Toggle -->
+        <button id="theme-toggle" class="glass-btn">🌙</button>
+
+        <!-- Main Content Area -->
+        <div id="content-wrapper">
+
+            <!-- Landing Page -->
+            <div id="landing-page" class="page active">
+                <div class="glass-panel hero-panel">
+                    <!-- Academic Header -->
+                    <div class="uni-header">
+                        <h3>الجمهورية الجزائرية الديمقراطية الشعبية</h3>
+                        <h3>وزارة التعليم العالي والبحث العلمي</h3>
+                        <h3>جامعة البويرة — كلية العلوم الإنسانية والاجتماعية</h3>
+                        <h3>قسم علوم الإعلام والاتصال</h3>
+                    </div>
+
+                    <div class="hero-content">
+                        <!-- Main Title -->
+                        <h1 class="main-title">دور التسويق الأخضر في تعزيز الصورة الذهنية لدى الجمهور</h1>
+                        <h2 class="sub-title">دراسة تحليلية حول جمعية البيئة تسالة في ظل استخدامات التكنولوجيا الذكية
+                        </h2>
+
+                        <!-- Academic Intro -->
+                        <div class="academic-intro">
+                            <p>السيد(ة) المحترم(ة)،</p>
+                            <p>في إطار إنجاز مذكرة ماستر، نضع بين أيديكم هذا الاستبيان الذي يهدف إلى جمع آرائكم
+                                وملاحظاتكم حول الموضوع.</p>
+                            <p class="note">نؤكد لكم أن جميع المعلومات التي تدلون بها ستُستخدم لأغراض البحث العلمي فقط،
+                                وستُعامَل بسرية تامة.</p>
+                        </div>
+
+                        <!-- Configurable Research Info -->
+                        <div class="research-info">
+                            <p id="student-name"><strong>الطالب(ة) الباحث(ة):</strong> ............</p>
+                            <p id="supervisor-name"><strong>تحت إشراف الأستاذ(ة):</strong> ............</p>
+                        </div>
+
+                        <div class="survey-cards">
+                            <!-- Citizen Card (was Customer) -->
+                            <div class="survey-card glass-card" onclick="startSurvey('customer')">
+                                <div class="card-inner">
+                                    <div class="card-icon">👥</div>
+                                    <h3>فضاء المواطن</h3>
+                                    <p>للمواطنين المتفاعلين مع الجمعية</p>
+                                    <span class="card-badge">شارك برأيك</span>
+                                </div>
+                            </div>
+
+                            <!-- Member Card (was Employee) -->
+                            <div class="survey-card glass-card" onclick="startSurvey('employee')">
+                                <div class="card-inner">
+                                    <div class="card-icon">🤝</div>
+                                    <h3>فضاء الأعضاء</h3>
+                                    <p>للقائمين على الجمعية</p>
+                                    <span class="card-badge">فضاء داخلي</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="admin-link">
+                            <button class="btn-text" onclick="showPasswordModal()">🔐 لوحة التحكم</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel qr-panel">
+                    <h3>شارك الاستبيان</h3>
+                    <div id="qr-code"></div>
+                    <button class="btn-copy" onclick="copyLink()">📋 نسخ الرابط</button>
+                </div>
+            </div>
+
+            <!-- Citizen Survey (ID kept as customer-survey for logic compatibility) -->
+            <div id="customer-survey" class="page">
+                <div class="glass-panel survey-container">
+                    <div class="progress-bar-container">
+                        <div class="progress-fill" id="customer-progress"></div>
+                    </div>
+
+                    <div class="survey-header">
+                        <button class="btn-back" onclick="showPage('landing-page')">← رجوع</button>
+                        <h2>استمارة المواطن</h2>
+                        <span class="step-indicator" id="customer-step">1/6</span>
+                    </div>
+
+                    <!-- Section 1: Personal Data -->
+                    <div class="survey-section active" data-section="1">
+                        <div class="section-title">
+                            <span class="section-number">01</span>
+                            <h3>البيانات الشخصية</h3>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">الجنس <span class="required">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-option"><input type="radio" name="c_gender" value="ذكر"
+                                        required><span>ذكر</span></label>
+                                <label class="radio-option"><input type="radio" name="c_gender"
+                                        value="أنثى"><span>أنثى</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">الفئة العمرية <span class="required">*</span></label>
+                            <div class="radio-group vertical">
+                                <label class="radio-option"><input type="radio" name="c_age" value="أقل من 25"><span>أقل
+                                        من 25 سنة</span></label>
+                                <label class="radio-option"><input type="radio" name="c_age" value="25-35"><span>25 - 35
+                                        سنة</span></label>
+                                <label class="radio-option"><input type="radio" name="c_age" value="36-45"><span>36 - 45
+                                        سنة</span></label>
+                                <label class="radio-option"><input type="radio" name="c_age" value="46-55"><span>46 - 55
+                                        سنة</span></label>
+                                <label class="radio-option"><input type="radio" name="c_age"
+                                        value="أكثر من 55"><span>أكثر من 55 سنة</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">المستوى التعليمي <span class="required">*</span></label>
+                            <div class="radio-group vertical">
+                                <label class="radio-option"><input type="radio" name="c_education"
+                                        value="ابتدائي"><span>ابتدائي</span></label>
+                                <label class="radio-option"><input type="radio" name="c_education"
+                                        value="متوسط"><span>متوسط</span></label>
+                                <label class="radio-option"><input type="radio" name="c_education"
+                                        value="ثانوي"><span>ثانوي</span></label>
+                                <label class="radio-option"><input type="radio" name="c_education"
+                                        value="جامعي"><span>جامعي</span></label>
+                                <label class="radio-option"><input type="radio" name="c_education"
+                                        value="دراسات عليا"><span>دراسات عليا</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">الوضعية المهنية <span class="required">*</span></label>
+                            <div class="radio-group vertical">
+                                <label class="radio-option"><input type="radio" name="c_profession"
+                                        value="موظف"><span>موظف</span></label>
+                                <label class="radio-option"><input type="radio" name="c_profession"
+                                        value="صاحب عمل حر"><span>صاحب عمل حر</span></label>
+                                <label class="radio-option"><input type="radio" name="c_profession"
+                                        value="متقاعد"><span>متقاعد</span></label>
+                                <label class="radio-option"><input type="radio" name="c_profession"
+                                        value="طالب"><span>طالب</span></label>
+                                <label class="radio-option"><input type="radio" name="c_profession"
+                                        value="بدون عمل"><span>بدون عمل</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">مستوى الدخل الشهري <span class="required">*</span></label>
+                            <div class="radio-group vertical">
+                                <label class="radio-option"><input type="radio" name="c_income"
+                                        value="أقل من 30000"><span>أقل من 30,000 دج</span></label>
+                                <label class="radio-option"><input type="radio" name="c_income"
+                                        value="30000-50000"><span>30,000 - 50,000 دج</span></label>
+                                <label class="radio-option"><input type="radio" name="c_income"
+                                        value="50000-80000"><span>50,000 - 80,000 دج</span></label>
+                                <label class="radio-option"><input type="radio" name="c_income"
+                                        value="أكثر من 80000"><span>أكثر من 80,000 دج</span></label>
+                            </div>
+                        </div>
+                        <button class="btn-next glow-btn" onclick="nextSection('customer', 1)">التالي ←</button>
+                    </div>
+
+                    <!-- Section 2: Awareness (Updated Terminology in UI only) -->
+                    <div class="survey-section" data-section="2">
+                        <div class="section-title">
+                            <span class="section-number">02</span>
+                            <h3>الثقافة والوعي الجمعوي</h3>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">هل تعرف ما هي أهداف الجمعية؟ <span
+                                    class="required">*</span></label>
+                            <div class="radio-group vertical">
+                                <label class="radio-option"><input type="radio" name="c_know_insurance"
+                                        value="نعم جيداً"><span>نعم، جيدًا</span></label>
+                                <label class="radio-option"><input type="radio" name="c_know_insurance"
+                                        value="نعم متوسط"><span>نعم، بشكل متوسط</span></label>
+                                <label class="radio-option"><input type="radio" name="c_know_insurance"
+                                        value="لا أعرف"><span>لا أعرف بالضبط</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">كيف عرفت عن الجمعية؟ (يمكن اختيار أكثر من إجابة)</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-option"><input type="checkbox" name="c_source"
+                                        value="الإعلانات"><span>الإعلانات/التواصل الاجتماعي</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_source"
+                                        value="الأصدقاء/العائلة"><span>الأصدقاء/العائلة</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_source"
+                                        value="العمل"><span>العمل</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_source"
+                                        value="النشاطات الميدانية"><span>النشاطات الميدانية</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_source"
+                                        value="أخرى"><span>أخرى</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">هل تعتقد أن نشاط الجمعية ضروري؟ <span
+                                    class="required">*</span></label>
+                            <div class="radio-group vertical">
+                                <label class="radio-option"><input type="radio" name="c_necessity"
+                                        value="ضروري جداً"><span>ضروري جدًا</span></label>
+                                <label class="radio-option"><input type="radio" name="c_necessity"
+                                        value="ضروري نسبياً"><span>ضروري نسبيًا</span></label>
+                                <label class="radio-option"><input type="radio" name="c_necessity"
+                                        value="غير ضروري"><span>غير ضروري</span></label>
+                                <label class="radio-option"><input type="radio" name="c_necessity"
+                                        value="لا رأي"><span>لا رأي</span></label>
+                            </div>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="btn-prev" onclick="prevSection('customer', 2)">→ السابق</button>
+                            <button class="btn-next glow-btn" onclick="nextSection('customer', 2)">التالي ←</button>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Behavior/Participation -->
+                    <div class="survey-section" data-section="3">
+                        <div class="section-title">
+                            <span class="section-number">03</span>
+                            <h3>المشاركة والتفاعل</h3>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">ما أنواع الأنشطة التي شاركت فيها؟ (يمكن اختيار أكثر من
+                                إجابة)</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-option"><input type="checkbox" name="c_insurance_type"
+                                        value="حملات تشجير"><span>حملات تشجير</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_insurance_type"
+                                        value="تنظيف أحياء"><span>تنظيف أحياء/شواطئ</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_insurance_type"
+                                        value="ندوات توعوية"><span>ندوات توعوية</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_insurance_type"
+                                        value="تبرع"><span>تبرع مادي/عيني</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_insurance_type"
+                                        value="عمل تطوعي"><span>عمل تطوعي عام</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_insurance_type"
+                                        value="لا أملك"><span>لم أشارك بعد</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">ما سبب اهتمامك بهذه الأنشطة؟ <span
+                                    class="required">*</span></label>
+                            <div class="radio-group vertical">
+                                <label class="radio-option"><input type="radio" name="c_reason"
+                                        value="واجب بيئي"><span>واجب بيئي/أخلاقي</span></label>
+                                <label class="radio-option"><input type="radio" name="c_reason"
+                                        value="حماية المحيط"><span>حماية المحيط</span></label>
+                                <label class="radio-option"><input type="radio" name="c_reason"
+                                        value="تطوير الذات"><span>تطوير الذات/علاقات</span></label>
+                                <label class="radio-option"><input type="radio" name="c_reason"
+                                        value="نصيحة"><span>نصيحة من آخرين</span></label>
+                                <label class="radio-option"><input type="radio" name="c_reason"
+                                        value="أخرى"><span>أخرى</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">هل تفكر في زيادة مشاركتك مستقبلاً؟ <span
+                                    class="required">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-option"><input type="radio" name="c_more_insurance"
+                                        value="نعم"><span>نعم</span></label>
+                                <label class="radio-option"><input type="radio" name="c_more_insurance"
+                                        value="لا"><span>لا</span></label>
+                                <label class="radio-option"><input type="radio" name="c_more_insurance"
+                                        value="ربما"><span>ربما مستقبلاً</span></label>
+                            </div>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="btn-prev" onclick="prevSection('customer', 3)">→ السابق</button>
+                            <button class="btn-next glow-btn" onclick="nextSection('customer', 3)">التالي ←</button>
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Service Quality / Activity Quality -->
+                    <div class="survey-section" data-section="4">
+                        <div class="section-title">
+                            <span class="section-number">04</span>
+                            <h3>تقييم جودة الأنشطة</h3>
+                        </div>
+                        <p class="section-desc">قيّم تجربتك مع الجمعية:</p>
+                        <div class="likert-table">
+                            <div class="likert-header">
+                                <span></span>
+                                <span>غير موافق أبدًا</span>
+                                <span>غير موافق</span>
+                                <span>محايد</span>
+                                <span>موافق</span>
+                                <span>موافق تمامًا</span>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">الاستقبال والتنظيم جيد</span>
+                                <label><input type="radio" name="c_q12" value="1"></label>
+                                <label><input type="radio" name="c_q12" value="2"></label>
+                                <label><input type="radio" name="c_q12" value="3"></label>
+                                <label><input type="radio" name="c_q12" value="4"></label>
+                                <label><input type="radio" name="c_q12" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">الأعضاء يشرحون الأهداف بوضوح</span>
+                                <label><input type="radio" name="c_q13" value="1"></label>
+                                <label><input type="radio" name="c_q13" value="2"></label>
+                                <label><input type="radio" name="c_q13" value="3"></label>
+                                <label><input type="radio" name="c_q13" value="4"></label>
+                                <label><input type="radio" name="c_q13" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">إجراءات الانضمام/المشاركة بسيطة</span>
+                                <label><input type="radio" name="c_q14" value="1"></label>
+                                <label><input type="radio" name="c_q14" value="2"></label>
+                                <label><input type="radio" name="c_q14" value="3"></label>
+                                <label><input type="radio" name="c_q14" value="4"></label>
+                                <label><input type="radio" name="c_q14" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">الاستجابة للاستفسارات سريعة</span>
+                                <label><input type="radio" name="c_q15" value="1"></label>
+                                <label><input type="radio" name="c_q15" value="2"></label>
+                                <label><input type="radio" name="c_q15" value="3"></label>
+                                <label><input type="radio" name="c_q15" value="4"></label>
+                                <label><input type="radio" name="c_q15" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">الشفافية في النشاطات واضحة</span>
+                                <label><input type="radio" name="c_q16" value="1"></label>
+                                <label><input type="radio" name="c_q16" value="2"></label>
+                                <label><input type="radio" name="c_q16" value="3"></label>
+                                <label><input type="radio" name="c_q16" value="4"></label>
+                                <label><input type="radio" name="c_q16" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">الانخراط متاح للجميع</span>
+                                <label><input type="radio" name="c_q17" value="1"></label>
+                                <label><input type="radio" name="c_q17" value="2"></label>
+                                <label><input type="radio" name="c_q17" value="3"></label>
+                                <label><input type="radio" name="c_q17" value="4"></label>
+                                <label><input type="radio" name="c_q17" value="5"></label>
+                            </div>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="btn-prev" onclick="prevSection('customer', 4)">→ السابق</button>
+                            <button class="btn-next glow-btn" onclick="nextSection('customer', 4)">التالي ←</button>
+                        </div>
+                    </div>
+
+                    <!-- Section 5: Trust & Satisfaction -->
+                    <div class="survey-section" data-section="5">
+                        <div class="section-title">
+                            <span class="section-number">05</span>
+                            <h3>الثقة والرضا</h3>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">ما مستوى ثقتك في الجمعية؟ <span
+                                    class="required">*</span></label>
+                            <div class="radio-group vertical">
+                                <label class="radio-option"><input type="radio" name="c_trust"
+                                        value="ثقة كبيرة"><span>ثقة كبيرة</span></label>
+                                <label class="radio-option"><input type="radio" name="c_trust"
+                                        value="ثقة متوسطة"><span>ثقة متوسطة</span></label>
+                                <label class="radio-option"><input type="radio" name="c_trust"
+                                        value="ثقة ضعيفة"><span>ثقة ضعيفة</span></label>
+                                <label class="radio-option"><input type="radio" name="c_trust" value="لا أثق"><span>لا
+                                        أثق مطلقًا</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">هل واجهت عراقيل في المشاركة؟ <span
+                                    class="required">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-option"><input type="radio" name="c_problems"
+                                        value="نعم"><span>نعم</span></label>
+                                <label class="radio-option"><input type="radio" name="c_problems"
+                                        value="لا"><span>لا</span></label>
+                                <label class="radio-option"><input type="radio" name="c_problems"
+                                        value="لم أطلب"><span>لم أشارك بفعالية بعد</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">إذا واجهت مشاكل، ما طبيعتها؟ (يمكن اختيار أكثر من
+                                إجابة)</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-option"><input type="checkbox" name="c_problem_type"
+                                        value="بطء الإجراءات"><span>سوء التنظيم</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_problem_type"
+                                        value="رفض التعويض"><span>نقص الإمكانيات</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_problem_type"
+                                        value="تعويض أقل"><span>توقيت غير مناسب</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_problem_type"
+                                        value="عدم وضوح الشروط"><span>غموض الأهداف</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_problem_type"
+                                        value="ضعف التواصل"><span>ضعف التواصل</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">ما مستوى رضاك العام؟ <span class="required">*</span></label>
+                            <div class="satisfaction-scale">
+                                <label class="satisfaction-option">
+                                    <input type="radio" name="c_satisfaction" value="1">
+                                    <span class="emoji">😠</span>
+                                    <span>غير راضٍ أبدًا</span>
+                                </label>
+                                <label class="satisfaction-option">
+                                    <input type="radio" name="c_satisfaction" value="2">
+                                    <span class="emoji">😞</span>
+                                    <span>غير راضٍ</span>
+                                </label>
+                                <label class="satisfaction-option">
+                                    <input type="radio" name="c_satisfaction" value="3">
+                                    <span class="emoji">😐</span>
+                                    <span>محايد</span>
+                                </label>
+                                <label class="satisfaction-option">
+                                    <input type="radio" name="c_satisfaction" value="4">
+                                    <span class="emoji">🙂</span>
+                                    <span>راضٍ</span>
+                                </label>
+                                <label class="satisfaction-option">
+                                    <input type="radio" name="c_satisfaction" value="5">
+                                    <span class="emoji">😊</span>
+                                    <span>راضٍ جدًا</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="btn-prev" onclick="prevSection('customer', 5)">→ السابق</button>
+                            <button class="btn-next glow-btn" onclick="nextSection('customer', 5)">التالي ←</button>
+                        </div>
+                    </div>
+
+                    <!-- Section 6: Suggestions -->
+                    <div class="survey-section" data-section="6">
+                        <div class="section-title">
+                            <span class="section-number">06</span>
+                            <h3>اقتراحات</h3>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">ما الذي يجب تحسينه في عمل الجمعية؟</label>
+                            <textarea name="c_suggestions" rows="5" placeholder="اكتب اقتراحاتك هنا..."></textarea>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="btn-prev" onclick="prevSection('customer', 6)">→ السابق</button>
+                            <button class="btn-submit glow-btn" onclick="submitSurvey('customer')">إرسال ✓</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Member Survey (ID kept as employee-survey for logic compatibility) -->
+            <div id="employee-survey" class="page">
+                <div class="glass-panel survey-container">
+                    <div class="progress-bar-container">
+                        <div class="progress-fill" id="employee-progress"></div>
+                    </div>
+                    <div class="survey-header">
+                        <button class="btn-back" onclick="showPage('landing-page')">← رجوع</button>
+                        <h2>استمارة الأعضاء</h2>
+                        <span class="step-indicator" id="employee-step">1/4</span>
+                    </div>
+
+                    <!-- Section 1: Professional/Association Data -->
+                    <div class="survey-section active" data-section="1">
+                        <div class="section-title">
+                            <span class="section-number">01</span>
+                            <h3>البيانات التنظيمية</h3>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">نوع العضوية <span class="required">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-option"><input type="radio" name="e_company_type" value="عمومية"
+                                        required><span>رئيسية</span></label>
+                                <label class="radio-option"><input type="radio" name="e_company_type"
+                                        value="خاصة"><span>شرفية</span></label>
+                                <label class="radio-option"><input type="radio" name="e_company_type"
+                                        value="مختلطة"><span>نشطة/متطوع</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">الدور/المنصب <span class="required">*</span></label>
+                            <div class="radio-group vertical">
+                                <label class="radio-option"><input type="radio" name="e_position"
+                                        value="موظف استقبال"><span>مكلف بالاستقبال</span></label>
+                                <label class="radio-option"><input type="radio" name="e_position"
+                                        value="مكلف بالاكتتاب"><span>مكلف بالتنظيم</span></label>
+                                <label class="radio-option"><input type="radio" name="e_position"
+                                        value="مكلف بالتعويضات"><span>مكلف بالمالية</span></label>
+                                <label class="radio-option"><input type="radio" name="e_position"
+                                        value="وكيل/وسيط"><span>مكلف بالإعلام</span></label>
+                                <label class="radio-option"><input type="radio" name="e_position"
+                                        value="إطار/مسؤول"><span>عضو مكتب</span></label>
+                                <label class="radio-option"><input type="radio" name="e_position"
+                                        value="أخرى"><span>أخرى</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">سنوات الخبرة في العمل الجمعوي <span
+                                    class="required">*</span></label>
+                            <div class="radio-group vertical">
+                                <label class="radio-option"><input type="radio" name="e_experience"
+                                        value="أقل من 2"><span>أقل من سنتين</span></label>
+                                <label class="radio-option"><input type="radio" name="e_experience" value="2-5"><span>2
+                                        - 5 سنوات</span></label>
+                                <label class="radio-option"><input type="radio" name="e_experience" value="5-10"><span>5
+                                        - 10 سنوات</span></label>
+                                <label class="radio-option"><input type="radio" name="e_experience"
+                                        value="أكثر من 10"><span>أكثر من 10 سنوات</span></label>
+                            </div>
+                        </div>
+                        <button class="btn-next glow-btn" onclick="nextSection('employee', 1)">التالي ←</button>
+                    </div>
+
+                    <!-- Section 2: Work Environment -->
+                    <div class="survey-section" data-section="2">
+                        <div class="section-title">
+                            <span class="section-number">02</span>
+                            <h3>تقييم بيئة العمل الجمعوي</h3>
+                        </div>
+                        <div class="likert-table">
+                            <div class="likert-header">
+                                <span></span>
+                                <span>غير موافق أبدًا</span>
+                                <span>غير موافق</span>
+                                <span>محايد</span>
+                                <span>موافق</span>
+                                <span>موافق تمامًا</span>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">أحصل على تكوين/تدريب كافٍ</span>
+                                <label><input type="radio" name="e_q4" value="1"></label>
+                                <label><input type="radio" name="e_q4" value="2"></label>
+                                <label><input type="radio" name="e_q4" value="3"></label>
+                                <label><input type="radio" name="e_q4" value="4"></label>
+                                <label><input type="radio" name="e_q4" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">المهام والأهداف واضحة</span>
+                                <label><input type="radio" name="e_q5" value="1"></label>
+                                <label><input type="radio" name="e_q5" value="2"></label>
+                                <label><input type="radio" name="e_q5" value="3"></label>
+                                <label><input type="radio" name="e_q5" value="4"></label>
+                                <label><input type="radio" name="e_q5" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">وسائل التواصل الداخلي فعالة</span>
+                                <label><input type="radio" name="e_q6" value="1"></label>
+                                <label><input type="radio" name="e_q6" value="2"></label>
+                                <label><input type="radio" name="e_q6" value="3"></label>
+                                <label><input type="radio" name="e_q6" value="4"></label>
+                                <label><input type="radio" name="e_q6" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">التنسيق بين الأعضاء جيد</span>
+                                <label><input type="radio" name="e_q7" value="1"></label>
+                                <label><input type="radio" name="e_q7" value="2"></label>
+                                <label><input type="radio" name="e_q7" value="3"></label>
+                                <label><input type="radio" name="e_q7" value="4"></label>
+                                <label><input type="radio" name="e_q7" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">الجمعية تستثمر في الرقمنة</span>
+                                <label><input type="radio" name="e_q8" value="1"></label>
+                                <label><input type="radio" name="e_q8" value="2"></label>
+                                <label><input type="radio" name="e_q8" value="3"></label>
+                                <label><input type="radio" name="e_q8" value="4"></label>
+                                <label><input type="radio" name="e_q8" value="5"></label>
+                            </div>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="btn-prev" onclick="prevSection('employee', 2)">→ السابق</button>
+                            <button class="btn-next glow-btn" onclick="nextSection('employee', 2)">التالي ←</button>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Citizen Relations -->
+                    <div class="survey-section" data-section="3">
+                        <div class="section-title">
+                            <span class="section-number">03</span>
+                            <h3>العلاقة مع المواطنين</h3>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">هل المواطنون يفهمون أهداف الجمعية؟ <span
+                                    class="required">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-option"><input type="radio" name="e_customer_understanding"
+                                        value="نعم"><span>نعم</span></label>
+                                <label class="radio-option"><input type="radio" name="e_customer_understanding"
+                                        value="إلى حد ما"><span>إلى حد ما</span></label>
+                                <label class="radio-option"><input type="radio" name="e_customer_understanding"
+                                        value="لا"><span>لا</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">ما أكثر ملاحظات/شكاوى المواطنين؟ (يمكن اختيار أكثر من
+                                إجابة)</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-option"><input type="checkbox" name="e_complaints"
+                                        value="بطء التعويضات"><span>سوء التوقيت</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="e_complaints"
+                                        value="غموض العقود"><span>غموض الأنشطة</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="e_complaints"
+                                        value="ارتفاع الأقساط"><span>نقص النتائج الملموسة</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="e_complaints"
+                                        value="ضعف التواصل"><span>ضعف التواصل</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="e_complaints"
+                                        value="رفض المطالبات"><span>عدم إشراكهم</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="e_complaints"
+                                        value="أخرى"><span>أخرى</span></label>
+                            </div>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="btn-prev" onclick="prevSection('employee', 3)">→ السابق</button>
+                            <button class="btn-next glow-btn" onclick="nextSection('employee', 3)">التالي ←</button>
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Challenges & Suggestions -->
+                    <div class="survey-section" data-section="4">
+                        <div class="section-title">
+                            <span class="section-number">04</span>
+                            <h3>التحديات والآفاق</h3>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">ما أهم تحديات العمل الجمعوي؟ (يمكن اختيار أكثر من
+                                إجابة)</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-option"><input type="checkbox" name="e_challenges"
+                                        value="ضعف الثقافة التأمينية"><span>ضعف الثقافة التطوعية</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="e_challenges"
+                                        value="المنافسة الشديدة"><span>نقص التمويل</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="e_challenges"
+                                        value="البيروقراطية"><span>البيروقراطية</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="e_challenges"
+                                        value="نقص الابتكار"><span>نقص الابتكار</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="e_challenges"
+                                        value="ضعف التنظيم القانوني"><span>ضعف القوانين</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="e_challenges"
+                                        value="أخرى"><span>أخرى</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">ما اقتراحاتك لتطوير الجمعية؟</label>
+                            <textarea name="e_suggestions" rows="5" placeholder="اكتب اقتراحاتك هنا..."></textarea>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="btn-prev" onclick="prevSection('employee', 4)">→ السابق</button>
+                            <button class="btn-submit glow-btn" onclick="submitSurvey('employee')">إرسال ✓</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thank You Page -->
+            <div id="thank-you" class="page">
+                <div class="glass-panel thank-you-content">
+                    <div class="success-icon glow-text">✓</div>
+                    <h2>شكرًا على مشاركتكم!</h2>
+                    <p>تم تسجيل إجاباتكم بنجاح. مساهمتكم تصنع الفارق معنا.</p>
+                    <button class="btn-primary glow-btn" onclick="showPage('landing-page')">العودة للصفحة
+                        الرئيسية</button>
+                </div>
+            </div>
+
+            <!-- Admin Page -->
+            <div id="admin-page" class="page">
+                <div class="glass-panel admin-container">
+                    <div class="admin-header">
+                        <button class="btn-back" onclick="showPage('landing-page')">← رجوع</button>
+                        <h2>🔐 لوحة التحكم</h2>
+                    </div>
+                    <div class="admin-settings-section glass-panel" style="margin-bottom: 20px; padding: 20px;">
+                        <h3>⚙️ إعدادات البحث</h3>
+                        <div class="input-group" style="margin-bottom: 15px;">
+                            <label style="display:block; margin-bottom: 5px;">اسم الطالب(ة) الباحث(ة):</label>
+                            <input type="text" id="admin-student-name"
+                                style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: inherit;">
+                        </div>
+                        <div class="input-group" style="margin-bottom: 15px;">
+                            <label style="display:block; margin-bottom: 5px;">اسم الأستاذ(ة) المشرف(ة):</label>
+                            <input type="text" id="admin-supervisor-name"
+                                style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: inherit;">
+                        </div>
+                        <button class="glow-btn" onclick="saveAdminSettings()">حفظ الإعدادات</button>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card glass-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-number" id="customer-count">0</div>
+                            <div class="stat-label">تفاعلات المواطنين</div>
+                        </div>
+                        <div class="stat-card glass-card">
+                            <div class="stat-icon">🤝</div>
+                            <div class="stat-number" id="employee-count">0</div>
+                            <div class="stat-label">مساهمات الأعضاء</div>
+                        </div>
+                    </div>
+                    <div class="export-section">
+                        <h3>تصدير البيانات</h3>
+                        <div class="export-buttons">
+                            <button class="btn-export glow-btn" onclick="exportData('customer', 'csv')">📊 تصدير
+                                المواطنين (CSV)</button>
+                            <button class="btn-export glow-btn" onclick="exportData('employee', 'csv')">📊 تصدير الأعضاء
+                                (CSV)</button>
+                            <button class="btn-export secondary" onclick="exportData('customer', 'json')">📁 JSON
+                                مواطنين</button>
+                            <button class="btn-export secondary" onclick="exportData('employee', 'json')">📁 JSON
+                                أعضاء</button>
+                        </div>
+                    </div>
+                    <div class="data-preview">
+                        <h3>معاينة البيانات</h3>
+                        <div class="tabs">
+                            <button class="tab active" onclick="showDataTab('customer')">المواطنين</button>
+                            <button class="tab" onclick="showDataTab('employee')">الأعضاء</button>
+                        </div>
+                        <div id="data-table-container">
+                            <p class="no-data">لا توجد بيانات بعد</p>
+                        </div>
+                    </div>
+                    <div class="danger-zone">
+                        <h3>⚠️ منطقة الخطر</h3>
+                        <button class="btn-danger" onclick="clearAllData()">🗑️ حذف جميع البيانات</button>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- End Content Wrapper -->
+
+        <!-- Password Modal -->
+        <div id="password-modal" class="modal">
+            <div class="glass-panel modal-content">
+                <div class="modal-header">
+                    <h3>🔐 تسجيل الدخول للإدارة</h3>
+                    <button class="modal-close" onclick="hidePasswordModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label>أدخل كلمة السر للوصول إلى البيانات:</label>
+                    <input type="password" id="admin-password" placeholder="كلمة السر"
+                        onkeypress="handlePasswordEnter(event)">
+                    <p id="password-error" class="error-msg"></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary glow-btn" onclick="checkPassword()">دخول</button>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- End World Container -->
+
+    <!-- SVG Filters for Watery Effects -->
+    <svg style="display: none;">
+        <defs>
+            <filter id="turbulence">
+                <feTurbulence type="fractalNoise" baseFrequency="0.01 0.05" numOctaves="2" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" />
+            </filter>
+        </defs>
+    </svg>
+
+    <script src="app.js"></script>
+    <script src="background.js"></script>
+</body>
+
+</html>
