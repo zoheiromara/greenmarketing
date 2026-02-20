@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
 <head>
@@ -11,6 +11,7 @@
         rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -58,9 +59,22 @@
                         </div>
 
                         <!-- Configurable Research Info -->
-                        <div class="research-info">
-                            <p id="student-name"><strong>الطالب(ة) الباحث(ة):</strong> ............</p>
-                            <p id="supervisor-name"><strong>تحت إشراف الأستاذ(ة):</strong> ............</p>
+                        <div class="research-info"
+                            style="display: flex; justify-content: space-around; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px;">
+                            <div style="text-align: center;">
+                                <p style="font-weight: 700; color: var(--primary-color); margin-bottom: 5px;">من إعداد
+                                    الطالبتين:</p>
+                                <p id="student1-name-display"
+                                    style="font-size: 1.1em; font-weight: bold; margin-bottom: 3px;">............</p>
+                                <p id="student2-name-display" style="font-size: 1.1em; font-weight: bold;">............
+                                </p>
+                            </div>
+                            <div style="text-align: center;">
+                                <p style="font-weight: 700; color: var(--primary-color); margin-bottom: 5px;">تحت إشراف
+                                    الدكتورة:</p>
+                                <p id="supervisor-name-display" style="font-size: 1.1em; font-weight: bold;">
+                                    ............</p>
+                            </div>
                         </div>
 
                         <div class="survey-cards">
@@ -77,10 +91,10 @@
                             <!-- Member Card (was Employee) -->
                             <div class="survey-card glass-card" onclick="startSurvey('employee')">
                                 <div class="card-inner">
-                                    <div class="card-icon">🤝</div>
-                                    <h3>فضاء الأعضاء</h3>
-                                    <p>للقائمين على الجمعية</p>
-                                    <span class="card-badge">فضاء داخلي</span>
+                                    <div class="card-icon">🎙️</div>
+                                    <h3>أداة المقابلة</h3>
+                                    <p>تسجيل وتفريغ المقابلات</p>
+                                    <span class="card-badge">للباحثين</span>
                                 </div>
                             </div>
                         </div>
@@ -108,17 +122,17 @@
                     <div class="survey-header">
                         <button class="btn-back" onclick="showPage('landing-page')">← رجوع</button>
                         <h2>استمارة المواطن</h2>
-                        <span class="step-indicator" id="customer-step">1/6</span>
+                        <span class="step-indicator" id="customer-step">1/8</span>
                     </div>
 
-                    <!-- Section 1: Personal Data -->
+                    <!-- Section 1: البيانات الشخصية والديموغرافية -->
                     <div class="survey-section active" data-section="1">
                         <div class="section-title">
                             <span class="section-number">01</span>
-                            <h3>البيانات الشخصية</h3>
+                            <h3>البيانات الشخصية والديموغرافية</h3>
                         </div>
                         <div class="question-group">
-                            <label class="question-label">الجنس <span class="required">*</span></label>
+                            <label class="question-label">1. الجنس <span class="required">*</span></label>
                             <div class="radio-group">
                                 <label class="radio-option"><input type="radio" name="c_gender" value="ذكر"
                                         required><span>ذكر</span></label>
@@ -127,111 +141,124 @@
                             </div>
                         </div>
                         <div class="question-group">
-                            <label class="question-label">الفئة العمرية <span class="required">*</span></label>
+                            <label class="question-label">2. الفئة العمرية <span class="required">*</span></label>
                             <div class="radio-group vertical">
-                                <label class="radio-option"><input type="radio" name="c_age" value="أقل من 25"><span>أقل
-                                        من 25 سنة</span></label>
-                                <label class="radio-option"><input type="radio" name="c_age" value="25-35"><span>25 - 35
-                                        سنة</span></label>
-                                <label class="radio-option"><input type="radio" name="c_age" value="36-45"><span>36 - 45
-                                        سنة</span></label>
-                                <label class="radio-option"><input type="radio" name="c_age" value="46-55"><span>46 - 55
-                                        سنة</span></label>
+                                <label class="radio-option"><input type="radio" name="c_age" value="أقل من 20"><span>أقل
+                                        من 20 سنة</span></label>
+                                <label class="radio-option"><input type="radio" name="c_age" value="20-30"><span>من 20
+                                        إلى 30 سنة</span></label>
+                                <label class="radio-option"><input type="radio" name="c_age" value="31-40"><span>من 31
+                                        إلى 40 سنة</span></label>
+                                <label class="radio-option"><input type="radio" name="c_age" value="41-50"><span>من 41
+                                        إلى 50 سنة</span></label>
                                 <label class="radio-option"><input type="radio" name="c_age"
-                                        value="أكثر من 55"><span>أكثر من 55 سنة</span></label>
+                                        value="أكثر من 50"><span>أكثر من 50 سنة</span></label>
                             </div>
                         </div>
                         <div class="question-group">
-                            <label class="question-label">المستوى التعليمي <span class="required">*</span></label>
+                            <label class="question-label">3. المستوى التعليمي <span class="required">*</span></label>
                             <div class="radio-group vertical">
                                 <label class="radio-option"><input type="radio" name="c_education"
-                                        value="ابتدائي"><span>ابتدائي</span></label>
+                                        value="ابتدائي أو أقل"><span>ابتدائي أو أقل</span></label>
                                 <label class="radio-option"><input type="radio" name="c_education"
                                         value="متوسط"><span>متوسط</span></label>
                                 <label class="radio-option"><input type="radio" name="c_education"
                                         value="ثانوي"><span>ثانوي</span></label>
                                 <label class="radio-option"><input type="radio" name="c_education"
-                                        value="جامعي"><span>جامعي</span></label>
+                                        value="جامعي"><span>جامعي (ليسانس / ماستر)</span></label>
                                 <label class="radio-option"><input type="radio" name="c_education"
-                                        value="دراسات عليا"><span>دراسات عليا</span></label>
+                                        value="دراسات عليا"><span>دراسات عليا (دكتوراه أو أكثر)</span></label>
                             </div>
                         </div>
                         <div class="question-group">
-                            <label class="question-label">الوضعية المهنية <span class="required">*</span></label>
+                            <label class="question-label">4. مكان الإقامة <span class="required">*</span></label>
                             <div class="radio-group vertical">
-                                <label class="radio-option"><input type="radio" name="c_profession"
-                                        value="موظف"><span>موظف</span></label>
-                                <label class="radio-option"><input type="radio" name="c_profession"
-                                        value="صاحب عمل حر"><span>صاحب عمل حر</span></label>
-                                <label class="radio-option"><input type="radio" name="c_profession"
-                                        value="متقاعد"><span>متقاعد</span></label>
-                                <label class="radio-option"><input type="radio" name="c_profession"
-                                        value="طالب"><span>طالب</span></label>
-                                <label class="radio-option"><input type="radio" name="c_profession"
-                                        value="بدون عمل"><span>بدون عمل</span></label>
+                                <label class="radio-option"><input type="radio" name="c_residence"
+                                        value="قرية تسالة"><span>قرية تسالة بتاغزوت</span></label>
+                                <label class="radio-option"><input type="radio" name="c_residence"
+                                        value="بلدية أخرى بالبويرة"><span>بلدية أخرى بولاية البويرة</span></label>
+                                <label class="radio-option"><input type="radio" name="c_residence"
+                                        value="ولاية أخرى"><span>ولاية أخرى</span></label>
                             </div>
                         </div>
                         <div class="question-group">
-                            <label class="question-label">مستوى الدخل الشهري <span class="required">*</span></label>
-                            <div class="radio-group vertical">
-                                <label class="radio-option"><input type="radio" name="c_income"
-                                        value="أقل من 30000"><span>أقل من 30,000 دج</span></label>
-                                <label class="radio-option"><input type="radio" name="c_income"
-                                        value="30000-50000"><span>30,000 - 50,000 دج</span></label>
-                                <label class="radio-option"><input type="radio" name="c_income"
-                                        value="50000-80000"><span>50,000 - 80,000 دج</span></label>
-                                <label class="radio-option"><input type="radio" name="c_income"
-                                        value="أكثر من 80000"><span>أكثر من 80,000 دج</span></label>
+                            <label class="question-label">5. هل أنت عضو أو منخرط في جمعية "ثغرما" لقرية تسالة؟ <span
+                                    class="required">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-option"><input type="radio" name="c_membership"
+                                        value="نعم"><span>نعم</span></label>
+                                <label class="radio-option"><input type="radio" name="c_membership"
+                                        value="لا"><span>لا</span></label>
+                            </div>
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">6. كيف تعرّفت على جمعية "ثغرما" لقرية تسالة؟</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-option"><input type="checkbox" name="c_discovery"
+                                        value="سكان القرية"><span>من خلال سكان القرية / الجيران</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_discovery"
+                                        value="وسائل التواصل"><span>من خلال وسائل التواصل الاجتماعي</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_discovery"
+                                        value="وسائل الإعلام"><span>من خلال وسائل الإعلام التقليدية</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_discovery"
+                                        value="المشاركة المباشرة"><span>من خلال المشاركة في أنشطة الجمعية
+                                        مباشرة</span></label>
+                                <label class="checkbox-option"><input type="checkbox" name="c_discovery"
+                                        value="أخرى"><span>أخرى</span></label>
                             </div>
                         </div>
                         <button class="btn-next glow-btn" onclick="nextSection('customer', 1)">التالي ←</button>
                     </div>
 
-                    <!-- Section 2: Awareness (Updated Terminology in UI only) -->
+                    <!-- المحور الأول: الوعي بالتسويق الأخضر -->
                     <div class="survey-section" data-section="2">
                         <div class="section-title">
                             <span class="section-number">02</span>
-                            <h3>الثقافة والوعي الجمعوي</h3>
+                            <h3>المحور الأول: الوعي بالتسويق الأخضر</h3>
                         </div>
-                        <div class="question-group">
-                            <label class="question-label">هل تعرف ما هي أهداف الجمعية؟ <span
-                                    class="required">*</span></label>
-                            <div class="radio-group vertical">
-                                <label class="radio-option"><input type="radio" name="c_know_insurance"
-                                        value="نعم جيداً"><span>نعم، جيدًا</span></label>
-                                <label class="radio-option"><input type="radio" name="c_know_insurance"
-                                        value="نعم متوسط"><span>نعم، بشكل متوسط</span></label>
-                                <label class="radio-option"><input type="radio" name="c_know_insurance"
-                                        value="لا أعرف"><span>لا أعرف بالضبط</span></label>
+                        <p class="section-desc">حدّد درجة موافقتك على كل عبارة:</p>
+                        <div class="likert-table">
+                            <div class="likert-header">
+                                <span></span>
+                                <span>غير موافق تماماً</span>
+                                <span>غير موافق</span>
+                                <span>محايد</span>
+                                <span>موافق</span>
+                                <span>موافق تماماً</span>
                             </div>
-                        </div>
-                        <div class="question-group">
-                            <label class="question-label">كيف عرفت عن الجمعية؟ (يمكن اختيار أكثر من إجابة)</label>
-                            <div class="checkbox-group">
-                                <label class="checkbox-option"><input type="checkbox" name="c_source"
-                                        value="الإعلانات"><span>الإعلانات/التواصل الاجتماعي</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="c_source"
-                                        value="الأصدقاء/العائلة"><span>الأصدقاء/العائلة</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="c_source"
-                                        value="العمل"><span>العمل</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="c_source"
-                                        value="النشاطات الميدانية"><span>النشاطات الميدانية</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="c_source"
-                                        value="أخرى"><span>أخرى</span></label>
+                            <div class="likert-row">
+                                <span class="likert-label">01. أعرف مفهوم التسويق الأخضر وأهدافه</span>
+                                <label><input type="radio" name="c_q01" value="1"></label>
+                                <label><input type="radio" name="c_q01" value="2"></label>
+                                <label><input type="radio" name="c_q01" value="3"></label>
+                                <label><input type="radio" name="c_q01" value="4"></label>
+                                <label><input type="radio" name="c_q01" value="5"></label>
                             </div>
-                        </div>
-                        <div class="question-group">
-                            <label class="question-label">هل تعتقد أن نشاط الجمعية ضروري؟ <span
-                                    class="required">*</span></label>
-                            <div class="radio-group vertical">
-                                <label class="radio-option"><input type="radio" name="c_necessity"
-                                        value="ضروري جداً"><span>ضروري جدًا</span></label>
-                                <label class="radio-option"><input type="radio" name="c_necessity"
-                                        value="ضروري نسبياً"><span>ضروري نسبيًا</span></label>
-                                <label class="radio-option"><input type="radio" name="c_necessity"
-                                        value="غير ضروري"><span>غير ضروري</span></label>
-                                <label class="radio-option"><input type="radio" name="c_necessity"
-                                        value="لا رأي"><span>لا رأي</span></label>
+                            <div class="likert-row">
+                                <span class="likert-label">02. أدرك أهمية الحفاظ على البيئة في حياتي اليومية</span>
+                                <label><input type="radio" name="c_q02" value="1"></label>
+                                <label><input type="radio" name="c_q02" value="2"></label>
+                                <label><input type="radio" name="c_q02" value="3"></label>
+                                <label><input type="radio" name="c_q02" value="4"></label>
+                                <label><input type="radio" name="c_q02" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">03. ألاحظ اهتماماً متزايداً بالمنتجات والخدمات الصديقة للبيئة
+                                    في محيطي</span>
+                                <label><input type="radio" name="c_q03" value="1"></label>
+                                <label><input type="radio" name="c_q03" value="2"></label>
+                                <label><input type="radio" name="c_q03" value="3"></label>
+                                <label><input type="radio" name="c_q03" value="4"></label>
+                                <label><input type="radio" name="c_q03" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">04. أعتقد أن الجمعيات البيئية تلعب دوراً في نشر ثقافة التسويق
+                                    الأخضر</span>
+                                <label><input type="radio" name="c_q04" value="1"></label>
+                                <label><input type="radio" name="c_q04" value="2"></label>
+                                <label><input type="radio" name="c_q04" value="3"></label>
+                                <label><input type="radio" name="c_q04" value="4"></label>
+                                <label><input type="radio" name="c_q04" value="5"></label>
                             </div>
                         </div>
                         <div class="nav-buttons">
@@ -240,56 +267,71 @@
                         </div>
                     </div>
 
-                    <!-- Section 3: Behavior/Participation -->
+                    <!-- المحور الثاني: ممارسات التسويق الأخضر -->
                     <div class="survey-section" data-section="3">
                         <div class="section-title">
                             <span class="section-number">03</span>
-                            <h3>المشاركة والتفاعل</h3>
+                            <h3>المحور الثاني: ممارسات التسويق الأخضر في الجمعية</h3>
                         </div>
-                        <div class="question-group">
-                            <label class="question-label">ما أنواع الأنشطة التي شاركت فيها؟ (يمكن اختيار أكثر من
-                                إجابة)</label>
-                            <div class="checkbox-group">
-                                <label class="checkbox-option"><input type="checkbox" name="c_insurance_type"
-                                        value="حملات تشجير"><span>حملات تشجير</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="c_insurance_type"
-                                        value="تنظيف أحياء"><span>تنظيف أحياء/شواطئ</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="c_insurance_type"
-                                        value="ندوات توعوية"><span>ندوات توعوية</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="c_insurance_type"
-                                        value="تبرع"><span>تبرع مادي/عيني</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="c_insurance_type"
-                                        value="عمل تطوعي"><span>عمل تطوعي عام</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="c_insurance_type"
-                                        value="لا أملك"><span>لم أشارك بعد</span></label>
+                        <p class="section-desc">حدّد درجة موافقتك على كل عبارة:</p>
+                        <div class="likert-table">
+                            <div class="likert-header">
+                                <span></span>
+                                <span>غير موافق تماماً</span>
+                                <span>غير موافق</span>
+                                <span>محايد</span>
+                                <span>موافق</span>
+                                <span>موافق تماماً</span>
                             </div>
-                        </div>
-                        <div class="question-group">
-                            <label class="question-label">ما سبب اهتمامك بهذه الأنشطة؟ <span
-                                    class="required">*</span></label>
-                            <div class="radio-group vertical">
-                                <label class="radio-option"><input type="radio" name="c_reason"
-                                        value="واجب بيئي"><span>واجب بيئي/أخلاقي</span></label>
-                                <label class="radio-option"><input type="radio" name="c_reason"
-                                        value="حماية المحيط"><span>حماية المحيط</span></label>
-                                <label class="radio-option"><input type="radio" name="c_reason"
-                                        value="تطوير الذات"><span>تطوير الذات/علاقات</span></label>
-                                <label class="radio-option"><input type="radio" name="c_reason"
-                                        value="نصيحة"><span>نصيحة من آخرين</span></label>
-                                <label class="radio-option"><input type="radio" name="c_reason"
-                                        value="أخرى"><span>أخرى</span></label>
+                            <div class="likert-row">
+                                <span class="likert-label">05. تعتمد الجمعية على مواد صديقة للبيئة في أنشطتها</span>
+                                <label><input type="radio" name="c_q05" value="1"></label>
+                                <label><input type="radio" name="c_q05" value="2"></label>
+                                <label><input type="radio" name="c_q05" value="3"></label>
+                                <label><input type="radio" name="c_q05" value="4"></label>
+                                <label><input type="radio" name="c_q05" value="5"></label>
                             </div>
-                        </div>
-                        <div class="question-group">
-                            <label class="question-label">هل تفكر في زيادة مشاركتك مستقبلاً؟ <span
-                                    class="required">*</span></label>
-                            <div class="radio-group">
-                                <label class="radio-option"><input type="radio" name="c_more_insurance"
-                                        value="نعم"><span>نعم</span></label>
-                                <label class="radio-option"><input type="radio" name="c_more_insurance"
-                                        value="لا"><span>لا</span></label>
-                                <label class="radio-option"><input type="radio" name="c_more_insurance"
-                                        value="ربما"><span>ربما مستقبلاً</span></label>
+                            <div class="likert-row">
+                                <span class="likert-label">06. تنظّم الجمعية حملات توعوية للحفاظ على البيئة</span>
+                                <label><input type="radio" name="c_q06" value="1"></label>
+                                <label><input type="radio" name="c_q06" value="2"></label>
+                                <label><input type="radio" name="c_q06" value="3"></label>
+                                <label><input type="radio" name="c_q06" value="4"></label>
+                                <label><input type="radio" name="c_q06" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">07. تشجّع الجمعية السكان على تبنّي سلوكات بيئية مسؤولة</span>
+                                <label><input type="radio" name="c_q07" value="1"></label>
+                                <label><input type="radio" name="c_q07" value="2"></label>
+                                <label><input type="radio" name="c_q07" value="3"></label>
+                                <label><input type="radio" name="c_q07" value="4"></label>
+                                <label><input type="radio" name="c_q07" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">08. تساهم الجمعية في تحسين المحيط البيئي للقرية</span>
+                                <label><input type="radio" name="c_q08" value="1"></label>
+                                <label><input type="radio" name="c_q08" value="2"></label>
+                                <label><input type="radio" name="c_q08" value="3"></label>
+                                <label><input type="radio" name="c_q08" value="4"></label>
+                                <label><input type="radio" name="c_q08" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">09. تعمل الجمعية على إعادة تدوير النفايات والاستفادة
+                                    منها</span>
+                                <label><input type="radio" name="c_q09" value="1"></label>
+                                <label><input type="radio" name="c_q09" value="2"></label>
+                                <label><input type="radio" name="c_q09" value="3"></label>
+                                <label><input type="radio" name="c_q09" value="4"></label>
+                                <label><input type="radio" name="c_q09" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">10. تتعاون الجمعية مع مؤسسات أخرى لدعم المشاريع
+                                    الخضراء</span>
+                                <label><input type="radio" name="c_q10" value="1"></label>
+                                <label><input type="radio" name="c_q10" value="2"></label>
+                                <label><input type="radio" name="c_q10" value="3"></label>
+                                <label><input type="radio" name="c_q10" value="4"></label>
+                                <label><input type="radio" name="c_q10" value="5"></label>
                             </div>
                         </div>
                         <div class="nav-buttons">
@@ -298,24 +340,32 @@
                         </div>
                     </div>
 
-                    <!-- Section 4: Service Quality / Activity Quality -->
+                    <!-- الصورة الذهنية: البعد المعرفي -->
                     <div class="survey-section" data-section="4">
                         <div class="section-title">
                             <span class="section-number">04</span>
-                            <h3>تقييم جودة الأنشطة</h3>
+                            <h3>الصورة الذهنية: البعد المعرفي</h3>
                         </div>
-                        <p class="section-desc">قيّم تجربتك مع الجمعية:</p>
+                        <p class="section-desc">حدّد درجة موافقتك على كل عبارة:</p>
                         <div class="likert-table">
                             <div class="likert-header">
                                 <span></span>
-                                <span>غير موافق أبدًا</span>
+                                <span>غير موافق تماماً</span>
                                 <span>غير موافق</span>
                                 <span>محايد</span>
                                 <span>موافق</span>
-                                <span>موافق تمامًا</span>
+                                <span>موافق تماماً</span>
                             </div>
                             <div class="likert-row">
-                                <span class="likert-label">الاستقبال والتنظيم جيد</span>
+                                <span class="likert-label">11. أعرف رسالة الجمعية وأهدافها البيئية الأساسية</span>
+                                <label><input type="radio" name="c_q11" value="1"></label>
+                                <label><input type="radio" name="c_q11" value="2"></label>
+                                <label><input type="radio" name="c_q11" value="3"></label>
+                                <label><input type="radio" name="c_q11" value="4"></label>
+                                <label><input type="radio" name="c_q11" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">12. لدي معلومات كافية عن أنشطة الجمعية ومشاريعها</span>
                                 <label><input type="radio" name="c_q12" value="1"></label>
                                 <label><input type="radio" name="c_q12" value="2"></label>
                                 <label><input type="radio" name="c_q12" value="3"></label>
@@ -323,7 +373,8 @@
                                 <label><input type="radio" name="c_q12" value="5"></label>
                             </div>
                             <div class="likert-row">
-                                <span class="likert-label">الأعضاء يشرحون الأهداف بوضوح</span>
+                                <span class="likert-label">13. أستطيع التمييز بين الجمعية وباقي الجمعيات من حيث طبيعة
+                                    نشاطها</span>
                                 <label><input type="radio" name="c_q13" value="1"></label>
                                 <label><input type="radio" name="c_q13" value="2"></label>
                                 <label><input type="radio" name="c_q13" value="3"></label>
@@ -331,36 +382,12 @@
                                 <label><input type="radio" name="c_q13" value="5"></label>
                             </div>
                             <div class="likert-row">
-                                <span class="likert-label">إجراءات الانضمام/المشاركة بسيطة</span>
+                                <span class="likert-label">14. أعتبر أن الجمعية تمتلك هوية بيئية واضحة ومميزة</span>
                                 <label><input type="radio" name="c_q14" value="1"></label>
                                 <label><input type="radio" name="c_q14" value="2"></label>
                                 <label><input type="radio" name="c_q14" value="3"></label>
                                 <label><input type="radio" name="c_q14" value="4"></label>
                                 <label><input type="radio" name="c_q14" value="5"></label>
-                            </div>
-                            <div class="likert-row">
-                                <span class="likert-label">الاستجابة للاستفسارات سريعة</span>
-                                <label><input type="radio" name="c_q15" value="1"></label>
-                                <label><input type="radio" name="c_q15" value="2"></label>
-                                <label><input type="radio" name="c_q15" value="3"></label>
-                                <label><input type="radio" name="c_q15" value="4"></label>
-                                <label><input type="radio" name="c_q15" value="5"></label>
-                            </div>
-                            <div class="likert-row">
-                                <span class="likert-label">الشفافية في النشاطات واضحة</span>
-                                <label><input type="radio" name="c_q16" value="1"></label>
-                                <label><input type="radio" name="c_q16" value="2"></label>
-                                <label><input type="radio" name="c_q16" value="3"></label>
-                                <label><input type="radio" name="c_q16" value="4"></label>
-                                <label><input type="radio" name="c_q16" value="5"></label>
-                            </div>
-                            <div class="likert-row">
-                                <span class="likert-label">الانخراط متاح للجميع</span>
-                                <label><input type="radio" name="c_q17" value="1"></label>
-                                <label><input type="radio" name="c_q17" value="2"></label>
-                                <label><input type="radio" name="c_q17" value="3"></label>
-                                <label><input type="radio" name="c_q17" value="4"></label>
-                                <label><input type="radio" name="c_q17" value="5"></label>
                             </div>
                         </div>
                         <div class="nav-buttons">
@@ -369,82 +396,53 @@
                         </div>
                     </div>
 
-                    <!-- Section 5: Trust & Satisfaction -->
+                    <!-- الصورة الذهنية: البعد الوجداني -->
                     <div class="survey-section" data-section="5">
                         <div class="section-title">
                             <span class="section-number">05</span>
-                            <h3>الثقة والرضا</h3>
+                            <h3>الصورة الذهنية: البعد الوجداني</h3>
                         </div>
-                        <div class="question-group">
-                            <label class="question-label">ما مستوى ثقتك في الجمعية؟ <span
-                                    class="required">*</span></label>
-                            <div class="radio-group vertical">
-                                <label class="radio-option"><input type="radio" name="c_trust"
-                                        value="ثقة كبيرة"><span>ثقة كبيرة</span></label>
-                                <label class="radio-option"><input type="radio" name="c_trust"
-                                        value="ثقة متوسطة"><span>ثقة متوسطة</span></label>
-                                <label class="radio-option"><input type="radio" name="c_trust"
-                                        value="ثقة ضعيفة"><span>ثقة ضعيفة</span></label>
-                                <label class="radio-option"><input type="radio" name="c_trust" value="لا أثق"><span>لا
-                                        أثق مطلقًا</span></label>
+                        <p class="section-desc">حدّد درجة موافقتك على كل عبارة:</p>
+                        <div class="likert-table">
+                            <div class="likert-header">
+                                <span></span>
+                                <span>غير موافق تماماً</span>
+                                <span>غير موافق</span>
+                                <span>محايد</span>
+                                <span>موافق</span>
+                                <span>موافق تماماً</span>
                             </div>
-                        </div>
-                        <div class="question-group">
-                            <label class="question-label">هل واجهت عراقيل في المشاركة؟ <span
-                                    class="required">*</span></label>
-                            <div class="radio-group">
-                                <label class="radio-option"><input type="radio" name="c_problems"
-                                        value="نعم"><span>نعم</span></label>
-                                <label class="radio-option"><input type="radio" name="c_problems"
-                                        value="لا"><span>لا</span></label>
-                                <label class="radio-option"><input type="radio" name="c_problems"
-                                        value="لم أطلب"><span>لم أشارك بفعالية بعد</span></label>
+                            <div class="likert-row">
+                                <span class="likert-label">15. أشعر بالارتياح تجاه أنشطة الجمعية البيئية</span>
+                                <label><input type="radio" name="c_q15" value="1"></label>
+                                <label><input type="radio" name="c_q15" value="2"></label>
+                                <label><input type="radio" name="c_q15" value="3"></label>
+                                <label><input type="radio" name="c_q15" value="4"></label>
+                                <label><input type="radio" name="c_q15" value="5"></label>
                             </div>
-                        </div>
-                        <div class="question-group">
-                            <label class="question-label">إذا واجهت مشاكل، ما طبيعتها؟ (يمكن اختيار أكثر من
-                                إجابة)</label>
-                            <div class="checkbox-group">
-                                <label class="checkbox-option"><input type="checkbox" name="c_problem_type"
-                                        value="بطء الإجراءات"><span>سوء التنظيم</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="c_problem_type"
-                                        value="رفض التعويض"><span>نقص الإمكانيات</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="c_problem_type"
-                                        value="تعويض أقل"><span>توقيت غير مناسب</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="c_problem_type"
-                                        value="عدم وضوح الشروط"><span>غموض الأهداف</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="c_problem_type"
-                                        value="ضعف التواصل"><span>ضعف التواصل</span></label>
+                            <div class="likert-row">
+                                <span class="likert-label">16. أشعر بالفخر عندما أشارك في أنشطة الجمعية</span>
+                                <label><input type="radio" name="c_q16" value="1"></label>
+                                <label><input type="radio" name="c_q16" value="2"></label>
+                                <label><input type="radio" name="c_q16" value="3"></label>
+                                <label><input type="radio" name="c_q16" value="4"></label>
+                                <label><input type="radio" name="c_q16" value="5"></label>
                             </div>
-                        </div>
-                        <div class="question-group">
-                            <label class="question-label">ما مستوى رضاك العام؟ <span class="required">*</span></label>
-                            <div class="satisfaction-scale">
-                                <label class="satisfaction-option">
-                                    <input type="radio" name="c_satisfaction" value="1">
-                                    <span class="emoji">😠</span>
-                                    <span>غير راضٍ أبدًا</span>
-                                </label>
-                                <label class="satisfaction-option">
-                                    <input type="radio" name="c_satisfaction" value="2">
-                                    <span class="emoji">😞</span>
-                                    <span>غير راضٍ</span>
-                                </label>
-                                <label class="satisfaction-option">
-                                    <input type="radio" name="c_satisfaction" value="3">
-                                    <span class="emoji">😐</span>
-                                    <span>محايد</span>
-                                </label>
-                                <label class="satisfaction-option">
-                                    <input type="radio" name="c_satisfaction" value="4">
-                                    <span class="emoji">🙂</span>
-                                    <span>راضٍ</span>
-                                </label>
-                                <label class="satisfaction-option">
-                                    <input type="radio" name="c_satisfaction" value="5">
-                                    <span class="emoji">😊</span>
-                                    <span>راضٍ جدًا</span>
-                                </label>
+                            <div class="likert-row">
+                                <span class="likert-label">17. أثق في مصداقية الجمعية وشفافيتها</span>
+                                <label><input type="radio" name="c_q17" value="1"></label>
+                                <label><input type="radio" name="c_q17" value="2"></label>
+                                <label><input type="radio" name="c_q17" value="3"></label>
+                                <label><input type="radio" name="c_q17" value="4"></label>
+                                <label><input type="radio" name="c_q17" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">18. أشعر بالانتماء للمجتمع من خلال مشاركتي في الجمعية</span>
+                                <label><input type="radio" name="c_q18" value="1"></label>
+                                <label><input type="radio" name="c_q18" value="2"></label>
+                                <label><input type="radio" name="c_q18" value="3"></label>
+                                <label><input type="radio" name="c_q18" value="4"></label>
+                                <label><input type="radio" name="c_q18" value="5"></label>
                             </div>
                         </div>
                         <div class="nav-buttons">
@@ -453,18 +451,217 @@
                         </div>
                     </div>
 
-                    <!-- Section 6: Suggestions -->
+                    <!-- الصورة الذهنية: البعد السلوكي -->
                     <div class="survey-section" data-section="6">
                         <div class="section-title">
                             <span class="section-number">06</span>
-                            <h3>اقتراحات</h3>
+                            <h3>الصورة الذهنية: البعد السلوكي</h3>
                         </div>
-                        <div class="question-group">
-                            <label class="question-label">ما الذي يجب تحسينه في عمل الجمعية؟</label>
-                            <textarea name="c_suggestions" rows="5" placeholder="اكتب اقتراحاتك هنا..."></textarea>
+                        <p class="section-desc">حدّد درجة موافقتك على كل عبارة:</p>
+                        <div class="likert-table">
+                            <div class="likert-header">
+                                <span></span>
+                                <span>غير موافق تماماً</span>
+                                <span>غير موافق</span>
+                                <span>محايد</span>
+                                <span>موافق</span>
+                                <span>موافق تماماً</span>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">19. أشارك بانتظام في الأنشطة التي تنظّمها الجمعية</span>
+                                <label><input type="radio" name="c_q19" value="1"></label>
+                                <label><input type="radio" name="c_q19" value="2"></label>
+                                <label><input type="radio" name="c_q19" value="3"></label>
+                                <label><input type="radio" name="c_q19" value="4"></label>
+                                <label><input type="radio" name="c_q19" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">20. أوصي الآخرين بالتعامل مع الجمعية ودعمها</span>
+                                <label><input type="radio" name="c_q20" value="1"></label>
+                                <label><input type="radio" name="c_q20" value="2"></label>
+                                <label><input type="radio" name="c_q20" value="3"></label>
+                                <label><input type="radio" name="c_q20" value="4"></label>
+                                <label><input type="radio" name="c_q20" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">21. أتبنّى سلوكات بيئية في حياتي بفضل تأثير الجمعية</span>
+                                <label><input type="radio" name="c_q21" value="1"></label>
+                                <label><input type="radio" name="c_q21" value="2"></label>
+                                <label><input type="radio" name="c_q21" value="3"></label>
+                                <label><input type="radio" name="c_q21" value="4"></label>
+                                <label><input type="radio" name="c_q21" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">22. أنوي الاستمرار في دعم الجمعية مستقبلاً</span>
+                                <label><input type="radio" name="c_q22" value="1"></label>
+                                <label><input type="radio" name="c_q22" value="2"></label>
+                                <label><input type="radio" name="c_q22" value="3"></label>
+                                <label><input type="radio" name="c_q22" value="4"></label>
+                                <label><input type="radio" name="c_q22" value="5"></label>
+                            </div>
                         </div>
                         <div class="nav-buttons">
                             <button class="btn-prev" onclick="prevSection('customer', 6)">→ السابق</button>
+                            <button class="btn-next glow-btn" onclick="nextSection('customer', 6)">التالي ←</button>
+                        </div>
+                    </div>
+
+                    <!-- الاتصال الرقمي -->
+                    <div class="survey-section" data-section="7">
+                        <div class="section-title">
+                            <span class="section-number">07</span>
+                            <h3>الاتصال الرقمي والوسائط</h3>
+                        </div>
+                        <p class="section-desc">حدّد درجة موافقتك على كل عبارة:</p>
+                        <div class="likert-table">
+                            <div class="likert-header">
+                                <span></span>
+                                <span>غير موافق تماماً</span>
+                                <span>غير موافق</span>
+                                <span>محايد</span>
+                                <span>موافق</span>
+                                <span>موافق تماماً</span>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">23. أتابع الجمعية عبر وسائل التواصل الاجتماعي</span>
+                                <label><input type="radio" name="c_q23" value="1"></label>
+                                <label><input type="radio" name="c_q23" value="2"></label>
+                                <label><input type="radio" name="c_q23" value="3"></label>
+                                <label><input type="radio" name="c_q23" value="4"></label>
+                                <label><input type="radio" name="c_q23" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">24. أتفاعل مع منشورات الجمعية الرقمية (إعجاب، تعليق،
+                                    مشاركة)</span>
+                                <label><input type="radio" name="c_q24" value="1"></label>
+                                <label><input type="radio" name="c_q24" value="2"></label>
+                                <label><input type="radio" name="c_q24" value="3"></label>
+                                <label><input type="radio" name="c_q24" value="4"></label>
+                                <label><input type="radio" name="c_q24" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">25. المحتوى الرقمي للجمعية يعزّز صورتها في ذهني</span>
+                                <label><input type="radio" name="c_q25" value="1"></label>
+                                <label><input type="radio" name="c_q25" value="2"></label>
+                                <label><input type="radio" name="c_q25" value="3"></label>
+                                <label><input type="radio" name="c_q25" value="4"></label>
+                                <label><input type="radio" name="c_q25" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">26. أعتبر أن التواصل الرقمي وسيلة فعالة لنشر رسالة
+                                    الجمعية</span>
+                                <label><input type="radio" name="c_q26" value="1"></label>
+                                <label><input type="radio" name="c_q26" value="2"></label>
+                                <label><input type="radio" name="c_q26" value="3"></label>
+                                <label><input type="radio" name="c_q26" value="4"></label>
+                                <label><input type="radio" name="c_q26" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">27. الموقع أو الصفحة الإلكترونية للجمعية توفر معلومات
+                                    كافية</span>
+                                <label><input type="radio" name="c_q27" value="1"></label>
+                                <label><input type="radio" name="c_q27" value="2"></label>
+                                <label><input type="radio" name="c_q27" value="3"></label>
+                                <label><input type="radio" name="c_q27" value="4"></label>
+                                <label><input type="radio" name="c_q27" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">28. أفضّل الاطلاع على أنشطة الجمعية عبر الإنترنت بدلاً من
+                                    الحضور</span>
+                                <label><input type="radio" name="c_q28" value="1"></label>
+                                <label><input type="radio" name="c_q28" value="2"></label>
+                                <label><input type="radio" name="c_q28" value="3"></label>
+                                <label><input type="radio" name="c_q28" value="4"></label>
+                                <label><input type="radio" name="c_q28" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">29. أقترح على الجمعية تطوير حضورها الرقمي أكثر</span>
+                                <label><input type="radio" name="c_q29" value="1"></label>
+                                <label><input type="radio" name="c_q29" value="2"></label>
+                                <label><input type="radio" name="c_q29" value="3"></label>
+                                <label><input type="radio" name="c_q29" value="4"></label>
+                                <label><input type="radio" name="c_q29" value="5"></label>
+                            </div>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="btn-prev" onclick="prevSection('customer', 7)">→ السابق</button>
+                            <button class="btn-next glow-btn" onclick="nextSection('customer', 7)">التالي ←</button>
+                        </div>
+                    </div>
+
+                    <!-- التكنولوجيا الذكية -->
+                    <div class="survey-section" data-section="8">
+                        <div class="section-title">
+                            <span class="section-number">08</span>
+                            <h3>التكنولوجيا الذكية واستخداماتها</h3>
+                        </div>
+                        <p class="section-desc">حدّد درجة موافقتك على كل عبارة:</p>
+                        <div class="likert-table">
+                            <div class="likert-header">
+                                <span></span>
+                                <span>غير موافق تماماً</span>
+                                <span>غير موافق</span>
+                                <span>محايد</span>
+                                <span>موافق</span>
+                                <span>موافق تماماً</span>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">30. أعتقد أن استخدام التكنولوجيا الذكية يساعد الجمعية في
+                                    تحقيق أهدافها</span>
+                                <label><input type="radio" name="c_q30" value="1"></label>
+                                <label><input type="radio" name="c_q30" value="2"></label>
+                                <label><input type="radio" name="c_q30" value="3"></label>
+                                <label><input type="radio" name="c_q30" value="4"></label>
+                                <label><input type="radio" name="c_q30" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">31. التكنولوجيا الذكية تسهّل التواصل بين الجمعية
+                                    والجمهور</span>
+                                <label><input type="radio" name="c_q31" value="1"></label>
+                                <label><input type="radio" name="c_q31" value="2"></label>
+                                <label><input type="radio" name="c_q31" value="3"></label>
+                                <label><input type="radio" name="c_q31" value="4"></label>
+                                <label><input type="radio" name="c_q31" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">32. يمكن للتكنولوجيا الذكية تعزيز الشفافية في عمل
+                                    الجمعية</span>
+                                <label><input type="radio" name="c_q32" value="1"></label>
+                                <label><input type="radio" name="c_q32" value="2"></label>
+                                <label><input type="radio" name="c_q32" value="3"></label>
+                                <label><input type="radio" name="c_q32" value="4"></label>
+                                <label><input type="radio" name="c_q32" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">33. أفضّل أن تستخدم الجمعية تطبيقات ذكية لإدارة
+                                    أنشطتها</span>
+                                <label><input type="radio" name="c_q33" value="1"></label>
+                                <label><input type="radio" name="c_q33" value="2"></label>
+                                <label><input type="radio" name="c_q33" value="3"></label>
+                                <label><input type="radio" name="c_q33" value="4"></label>
+                                <label><input type="radio" name="c_q33" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">34. التكنولوجيا الذكية تساهم في تحسين الصورة الذهنية
+                                    للجمعية</span>
+                                <label><input type="radio" name="c_q34" value="1"></label>
+                                <label><input type="radio" name="c_q34" value="2"></label>
+                                <label><input type="radio" name="c_q34" value="3"></label>
+                                <label><input type="radio" name="c_q34" value="4"></label>
+                                <label><input type="radio" name="c_q34" value="5"></label>
+                            </div>
+                            <div class="likert-row">
+                                <span class="likert-label">35. أعتقد أن الجمعية بحاجة لتطوير استخدامها للتكنولوجيا
+                                    الذكية</span>
+                                <label><input type="radio" name="c_q35" value="1"></label>
+                                <label><input type="radio" name="c_q35" value="2"></label>
+                                <label><input type="radio" name="c_q35" value="3"></label>
+                                <label><input type="radio" name="c_q35" value="4"></label>
+                                <label><input type="radio" name="c_q35" value="5"></label>
+                            </div>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="btn-prev" onclick="prevSection('customer', 8)">→ السابق</button>
                             <button class="btn-submit glow-btn" onclick="submitSurvey('customer')">إرسال ✓</button>
                         </div>
                     </div>
@@ -472,123 +669,100 @@
             </div>
 
             <!-- Member Survey (ID kept as employee-survey for logic compatibility) -->
+            <!-- Interview Recorder (replaces employee-survey) -->
             <div id="employee-survey" class="page">
-                <div class="glass-panel survey-container">
+                <div class="glass-panel survey-container interview-container">
                     <div class="progress-bar-container">
                         <div class="progress-fill" id="employee-progress"></div>
                     </div>
                     <div class="survey-header">
                         <button class="btn-back" onclick="showPage('landing-page')">← رجوع</button>
-                        <h2>استمارة الأعضاء</h2>
-                        <span class="step-indicator" id="employee-step">1/4</span>
+                        <h2>🎙️ أداة المقابلة</h2>
+                        <span class="step-indicator" id="employee-step">1/8</span>
                     </div>
 
-                    <!-- Section 1: Professional/Association Data -->
+                    <!-- Section 1: Interviewee Metadata -->
                     <div class="survey-section active" data-section="1">
                         <div class="section-title">
                             <span class="section-number">01</span>
-                            <h3>البيانات التنظيمية</h3>
+                            <h3>بيانات المبحوث</h3>
+                        </div>
+                        <p class="section-desc">تُملأ قبل بدء المقابلة</p>
+                        <div class="question-group">
+                            <label class="question-label">الاسم واللقب (أو رمز) <span class="required">*</span></label>
+                            <input type="text" name="e_interviewee_name" placeholder="اسم المبحوث أو رمز..."
+                                class="text-input">
                         </div>
                         <div class="question-group">
-                            <label class="question-label">نوع العضوية <span class="required">*</span></label>
-                            <div class="radio-group">
-                                <label class="radio-option"><input type="radio" name="e_company_type" value="عمومية"
-                                        required><span>رئيسية</span></label>
-                                <label class="radio-option"><input type="radio" name="e_company_type"
-                                        value="خاصة"><span>شرفية</span></label>
-                                <label class="radio-option"><input type="radio" name="e_company_type"
-                                        value="مختلطة"><span>نشطة/متطوع</span></label>
-                            </div>
+                            <label class="question-label">المنصب في الجمعية <span class="required">*</span></label>
+                            <input type="text" name="e_position" placeholder="رئيس، نائب، عضو..." class="text-input">
                         </div>
                         <div class="question-group">
-                            <label class="question-label">الدور/المنصب <span class="required">*</span></label>
+                            <label class="question-label">مدة العضوية في الجمعية</label>
+                            <input type="text" name="e_membership_duration" placeholder="مثلاً: 3 سنوات"
+                                class="text-input">
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label">المستوى التعليمي</label>
                             <div class="radio-group vertical">
-                                <label class="radio-option"><input type="radio" name="e_position"
-                                        value="موظف استقبال"><span>مكلف بالاستقبال</span></label>
-                                <label class="radio-option"><input type="radio" name="e_position"
-                                        value="مكلف بالاكتتاب"><span>مكلف بالتنظيم</span></label>
-                                <label class="radio-option"><input type="radio" name="e_position"
-                                        value="مكلف بالتعويضات"><span>مكلف بالمالية</span></label>
-                                <label class="radio-option"><input type="radio" name="e_position"
-                                        value="وكيل/وسيط"><span>مكلف بالإعلام</span></label>
-                                <label class="radio-option"><input type="radio" name="e_position"
-                                        value="إطار/مسؤول"><span>عضو مكتب</span></label>
-                                <label class="radio-option"><input type="radio" name="e_position"
-                                        value="أخرى"><span>أخرى</span></label>
+                                <label class="radio-option"><input type="radio" name="e_education"
+                                        value="ابتدائي أو أقل"><span>ابتدائي أو أقل</span></label>
+                                <label class="radio-option"><input type="radio" name="e_education"
+                                        value="متوسط"><span>متوسط</span></label>
+                                <label class="radio-option"><input type="radio" name="e_education"
+                                        value="ثانوي"><span>ثانوي</span></label>
+                                <label class="radio-option"><input type="radio" name="e_education"
+                                        value="جامعي"><span>جامعي</span></label>
+                                <label class="radio-option"><input type="radio" name="e_education"
+                                        value="دراسات عليا"><span>دراسات
+                                        عليا</span></label>
                             </div>
                         </div>
                         <div class="question-group">
-                            <label class="question-label">سنوات الخبرة في العمل الجمعوي <span
-                                    class="required">*</span></label>
-                            <div class="radio-group vertical">
-                                <label class="radio-option"><input type="radio" name="e_experience"
-                                        value="أقل من 2"><span>أقل من سنتين</span></label>
-                                <label class="radio-option"><input type="radio" name="e_experience" value="2-5"><span>2
-                                        - 5 سنوات</span></label>
-                                <label class="radio-option"><input type="radio" name="e_experience" value="5-10"><span>5
-                                        - 10 سنوات</span></label>
-                                <label class="radio-option"><input type="radio" name="e_experience"
-                                        value="أكثر من 10"><span>أكثر من 10 سنوات</span></label>
-                            </div>
+                            <label class="question-label">السن</label>
+                            <input type="number" name="e_age" placeholder="العمر" class="text-input"
+                                style="max-width:150px;">
                         </div>
-                        <button class="btn-next glow-btn" onclick="nextSection('employee', 1)">التالي ←</button>
+                        <div class="question-group">
+                            <label class="question-label">مكان المقابلة</label>
+                            <input type="text" name="e_interview_location" placeholder="مقر الجمعية، قرية تسالة..."
+                                class="text-input">
+                        </div>
+                        <button class="btn-next glow-btn" onclick="nextSection('employee', 1)">بدء المقابلة 🎙️</button>
                     </div>
 
-                    <!-- Section 2: Work Environment -->
+                    <!-- Section 2: Axis 1 - التعريف بالجمعية ونشأتها -->
                     <div class="survey-section" data-section="2">
                         <div class="section-title">
                             <span class="section-number">02</span>
-                            <h3>تقييم بيئة العمل الجمعوي</h3>
+                            <h3>المحور الأول: التعريف بالجمعية ونشأتها</h3>
                         </div>
-                        <div class="likert-table">
-                            <div class="likert-header">
-                                <span></span>
-                                <span>غير موافق أبدًا</span>
-                                <span>غير موافق</span>
-                                <span>محايد</span>
-                                <span>موافق</span>
-                                <span>موافق تمامًا</span>
-                            </div>
-                            <div class="likert-row">
-                                <span class="likert-label">أحصل على تكوين/تدريب كافٍ</span>
-                                <label><input type="radio" name="e_q4" value="1"></label>
-                                <label><input type="radio" name="e_q4" value="2"></label>
-                                <label><input type="radio" name="e_q4" value="3"></label>
-                                <label><input type="radio" name="e_q4" value="4"></label>
-                                <label><input type="radio" name="e_q4" value="5"></label>
-                            </div>
-                            <div class="likert-row">
-                                <span class="likert-label">المهام والأهداف واضحة</span>
-                                <label><input type="radio" name="e_q5" value="1"></label>
-                                <label><input type="radio" name="e_q5" value="2"></label>
-                                <label><input type="radio" name="e_q5" value="3"></label>
-                                <label><input type="radio" name="e_q5" value="4"></label>
-                                <label><input type="radio" name="e_q5" value="5"></label>
-                            </div>
-                            <div class="likert-row">
-                                <span class="likert-label">وسائل التواصل الداخلي فعالة</span>
-                                <label><input type="radio" name="e_q6" value="1"></label>
-                                <label><input type="radio" name="e_q6" value="2"></label>
-                                <label><input type="radio" name="e_q6" value="3"></label>
-                                <label><input type="radio" name="e_q6" value="4"></label>
-                                <label><input type="radio" name="e_q6" value="5"></label>
-                            </div>
-                            <div class="likert-row">
-                                <span class="likert-label">التنسيق بين الأعضاء جيد</span>
-                                <label><input type="radio" name="e_q7" value="1"></label>
-                                <label><input type="radio" name="e_q7" value="2"></label>
-                                <label><input type="radio" name="e_q7" value="3"></label>
-                                <label><input type="radio" name="e_q7" value="4"></label>
-                                <label><input type="radio" name="e_q7" value="5"></label>
-                            </div>
-                            <div class="likert-row">
-                                <span class="likert-label">الجمعية تستثمر في الرقمنة</span>
-                                <label><input type="radio" name="e_q8" value="1"></label>
-                                <label><input type="radio" name="e_q8" value="2"></label>
-                                <label><input type="radio" name="e_q8" value="3"></label>
-                                <label><input type="radio" name="e_q8" value="4"></label>
-                                <label><input type="radio" name="e_q8" value="5"></label>
-                            </div>
+                        <p class="section-desc axis-desc">يهدف هذا المحور إلى فهم السياق التأسيسي للجمعية ودوافع إنشائها
+                            والبيئة
+                            التي نشأت فيها.</p>
+                        <div class="interview-question" data-q="س1">
+                            <p class="q-text"><strong>س1.</strong> هل يمكنكم أن تُحدّثونا عن نشأة جمعية "ثغرما" لقرية
+                                تسالة؟ ما
+                                الظروف والدوافع التي أدّت إلى تأسيسها؟</p>
+                            <div class="recorder-box" id="rec-s1"></div>
+                        </div>
+                        <div class="interview-question" data-q="س2">
+                            <p class="q-text"><strong>س2.</strong> ما هي الأهداف الرئيسية التي تسعى الجمعية إلى تحقيقها؟
+                                وهل تغيّرت
+                                هذه الأهداف منذ التأسيس؟</p>
+                            <div class="recorder-box" id="rec-s2"></div>
+                        </div>
+                        <div class="interview-question" data-q="س3">
+                            <p class="q-text"><strong>س3.</strong> كيف يُنظَّم العمل داخل الجمعية؟ صِف لنا الهيكل
+                                التنظيمي وعدد
+                                الأعضاء الناشطين والمتطوعين.</p>
+                            <div class="recorder-box" id="rec-s3"></div>
+                        </div>
+                        <div class="interview-question" data-q="س4">
+                            <p class="q-text"><strong>س4.</strong> ما هو الدور الذي يلعبه النادي البيئي للقرية ضمن أنشطة
+                                الجمعية؟
+                            </p>
+                            <div class="recorder-box" id="rec-s4"></div>
                         </div>
                         <div class="nav-buttons">
                             <button class="btn-prev" onclick="prevSection('employee', 2)">→ السابق</button>
@@ -596,41 +770,44 @@
                         </div>
                     </div>
 
-                    <!-- Section 3: Citizen Relations -->
+                    <!-- Section 3: Axis 2 - ممارسات التسويق الأخضر -->
                     <div class="survey-section" data-section="3">
                         <div class="section-title">
                             <span class="section-number">03</span>
-                            <h3>العلاقة مع المواطنين</h3>
+                            <h3>المحور الثاني: ممارسات التسويق الأخضر</h3>
                         </div>
-                        <div class="question-group">
-                            <label class="question-label">هل المواطنون يفهمون أهداف الجمعية؟ <span
-                                    class="required">*</span></label>
-                            <div class="radio-group">
-                                <label class="radio-option"><input type="radio" name="e_customer_understanding"
-                                        value="نعم"><span>نعم</span></label>
-                                <label class="radio-option"><input type="radio" name="e_customer_understanding"
-                                        value="إلى حد ما"><span>إلى حد ما</span></label>
-                                <label class="radio-option"><input type="radio" name="e_customer_understanding"
-                                        value="لا"><span>لا</span></label>
-                            </div>
+                        <p class="section-desc axis-desc">يتناول هذا المحور الأنشطة والممارسات البيئية التي تتبناها
+                            الجمعية ومدى
+                            ارتباطها بمبادئ التسويق الأخضر.</p>
+                        <div class="interview-question" data-q="س5">
+                            <p class="q-text"><strong>س5.</strong> ما هي أبرز الأنشطة البيئية التي تقوم بها الجمعية؟
+                                (تنظيف، تشجير،
+                                إعادة تدوير، توعية...)</p>
+                            <div class="recorder-box" id="rec-s5"></div>
                         </div>
-                        <div class="question-group">
-                            <label class="question-label">ما أكثر ملاحظات/شكاوى المواطنين؟ (يمكن اختيار أكثر من
-                                إجابة)</label>
-                            <div class="checkbox-group">
-                                <label class="checkbox-option"><input type="checkbox" name="e_complaints"
-                                        value="بطء التعويضات"><span>سوء التوقيت</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="e_complaints"
-                                        value="غموض العقود"><span>غموض الأنشطة</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="e_complaints"
-                                        value="ارتفاع الأقساط"><span>نقص النتائج الملموسة</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="e_complaints"
-                                        value="ضعف التواصل"><span>ضعف التواصل</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="e_complaints"
-                                        value="رفض المطالبات"><span>عدم إشراكهم</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="e_complaints"
-                                        value="أخرى"><span>أخرى</span></label>
-                            </div>
+                        <div class="interview-question" data-q="س6">
+                            <p class="q-text"><strong>س6.</strong> هل تعتمد الجمعية على خطة أو استراتيجية واضحة في
+                                الترويج لأنشطتها
+                                البيئية؟ وإن وُجدت، فما هي ملامحها؟</p>
+                            <div class="recorder-box" id="rec-s6"></div>
+                        </div>
+                        <div class="interview-question" data-q="س7">
+                            <p class="q-text"><strong>س7.</strong> كيف تُسوّق الجمعية لمشاريعها البيئية لدى الجمهور
+                                المحلي والخارجي؟
+                                ما الأساليب المعتمدة؟</p>
+                            <div class="recorder-box" id="rec-s7"></div>
+                        </div>
+                        <div class="interview-question" data-q="س8">
+                            <p class="q-text"><strong>س8.</strong> هل سمعتم من قبل بمصطلح "التسويق الأخضر"؟ وهل ترون أن
+                                ممارسات
+                                الجمعية تندرج ضمنه؟</p>
+                            <div class="recorder-box" id="rec-s8"></div>
+                        </div>
+                        <div class="interview-question" data-q="س9">
+                            <p class="q-text"><strong>س9.</strong> هل هناك شراكات أو تعاون مع جمعيات أو هيئات أخرى
+                                لتعزيز النشاط
+                                البيئي؟</p>
+                            <div class="recorder-box" id="rec-s9"></div>
                         </div>
                         <div class="nav-buttons">
                             <button class="btn-prev" onclick="prevSection('employee', 3)">→ السابق</button>
@@ -638,37 +815,182 @@
                         </div>
                     </div>
 
-                    <!-- Section 4: Challenges & Suggestions -->
+                    <!-- Section 4: Axis 3 - الصورة الذهنية -->
                     <div class="survey-section" data-section="4">
                         <div class="section-title">
                             <span class="section-number">04</span>
-                            <h3>التحديات والآفاق</h3>
+                            <h3>المحور الثالث: الصورة الذهنية للجمعية</h3>
                         </div>
-                        <div class="question-group">
-                            <label class="question-label">ما أهم تحديات العمل الجمعوي؟ (يمكن اختيار أكثر من
-                                إجابة)</label>
-                            <div class="checkbox-group">
-                                <label class="checkbox-option"><input type="checkbox" name="e_challenges"
-                                        value="ضعف الثقافة التأمينية"><span>ضعف الثقافة التطوعية</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="e_challenges"
-                                        value="المنافسة الشديدة"><span>نقص التمويل</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="e_challenges"
-                                        value="البيروقراطية"><span>البيروقراطية</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="e_challenges"
-                                        value="نقص الابتكار"><span>نقص الابتكار</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="e_challenges"
-                                        value="ضعف التنظيم القانوني"><span>ضعف القوانين</span></label>
-                                <label class="checkbox-option"><input type="checkbox" name="e_challenges"
-                                        value="أخرى"><span>أخرى</span></label>
-                            </div>
+                        <p class="section-desc axis-desc">يهدف إلى استكشاف تصورات المسؤولين عن الصورة التي تحملها
+                            الجمعية لدى
+                            الجمهور.</p>
+                        <div class="interview-question" data-q="س10">
+                            <p class="q-text"><strong>س10.</strong> كيف تُقيّمون الصورة الحالية للجمعية لدى سكان القرية
+                                والجمهور
+                                العام؟</p>
+                            <div class="recorder-box" id="rec-s10"></div>
                         </div>
-                        <div class="question-group">
-                            <label class="question-label">ما اقتراحاتك لتطوير الجمعية؟</label>
-                            <textarea name="e_suggestions" rows="5" placeholder="اكتب اقتراحاتك هنا..."></textarea>
+                        <div class="interview-question" data-q="س11">
+                            <p class="q-text"><strong>س11.</strong> ما هي المؤشرات التي تعتمدون عليها لمعرفة مدى رضا
+                                الجمهور عن
+                                أنشطة الجمعية؟</p>
+                            <div class="recorder-box" id="rec-s11"></div>
+                        </div>
+                        <div class="interview-question" data-q="س12">
+                            <p class="q-text"><strong>س12.</strong> هل تعتقدون أن الأنشطة البيئية والتطوعية ساهمت في
+                                تحسين صورة
+                                الجمعية؟ كيف ذلك؟</p>
+                            <div class="recorder-box" id="rec-s12"></div>
+                        </div>
+                        <div class="interview-question" data-q="س13">
+                            <p class="q-text"><strong>س13.</strong> هل سبق أن واجهت الجمعية انتقادات أو صورة سلبية؟ وكيف
+                                تعاملتم مع
+                                ذلك؟</p>
+                            <div class="recorder-box" id="rec-s13"></div>
+                        </div>
+                        <div class="interview-question" data-q="س14">
+                            <p class="q-text"><strong>س14.</strong> هل ترون أن زيارة وزيرة البيئة ووالي البويرة أثّرت
+                                على الصورة
+                                الذهنية للجمعية؟</p>
+                            <div class="recorder-box" id="rec-s14"></div>
                         </div>
                         <div class="nav-buttons">
                             <button class="btn-prev" onclick="prevSection('employee', 4)">→ السابق</button>
-                            <button class="btn-submit glow-btn" onclick="submitSurvey('employee')">إرسال ✓</button>
+                            <button class="btn-next glow-btn" onclick="nextSection('employee', 4)">التالي ←</button>
+                        </div>
+                    </div>
+
+                    <!-- Section 5: Axis 4 - الاتصال الرقمي -->
+                    <div class="survey-section" data-section="5">
+                        <div class="section-title">
+                            <span class="section-number">05</span>
+                            <h3>المحور الرابع: الاتصال الرقمي ووسائل التواصل</h3>
+                        </div>
+                        <p class="section-desc axis-desc">يركّز على الاستراتيجيات والأدوات الرقمية التي توظفها الجمعية
+                            في تواصلها مع
+                            الجمهور.</p>
+                        <div class="interview-question" data-q="س15">
+                            <p class="q-text"><strong>س15.</strong> ما هي المنصات الرقمية التي تستخدمها الجمعية في
+                                تواصلها مع
+                                الجمهور؟</p>
+                            <div class="recorder-box" id="rec-s15"></div>
+                        </div>
+                        <div class="interview-question" data-q="س16">
+                            <p class="q-text"><strong>س16.</strong> من هو المسؤول عن إدارة المحتوى الرقمي؟ وهل هناك خطة
+                                اتصالية
+                                رقمية واضحة؟</p>
+                            <div class="recorder-box" id="rec-s16"></div>
+                        </div>
+                        <div class="interview-question" data-q="س17">
+                            <p class="q-text"><strong>س17.</strong> ما أنواع المحتوى الرقمي الأكثر نشرًا؟ وأيّها يحقق
+                                تفاعلًا أكبر
+                                من الجمهور؟</p>
+                            <div class="recorder-box" id="rec-s17"></div>
+                        </div>
+                        <div class="interview-question" data-q="س18">
+                            <p class="q-text"><strong>س18.</strong> كيف تُقيّمون مستوى التفاعل الرقمي مع الجمهور؟ وما
+                                العوائق التي
+                                تواجهونها؟</p>
+                            <div class="recorder-box" id="rec-s18"></div>
+                        </div>
+                        <div class="interview-question" data-q="س19">
+                            <p class="q-text"><strong>س19.</strong> هل ترون أن التواجد الرقمي أسهم في تحسين صورة
+                                الجمعية؟ أعطِ أمثلة
+                                ملموسة.</p>
+                            <div class="recorder-box" id="rec-s19"></div>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="btn-prev" onclick="prevSection('employee', 5)">→ السابق</button>
+                            <button class="btn-next glow-btn" onclick="nextSection('employee', 5)">التالي ←</button>
+                        </div>
+                    </div>
+
+                    <!-- Section 6: Axis 5 - التكنولوجيا الذكية -->
+                    <div class="survey-section" data-section="6">
+                        <div class="section-title">
+                            <span class="section-number">06</span>
+                            <h3>المحور الخامس: التكنولوجيا الذكية والتوعية البيئية</h3>
+                        </div>
+                        <p class="section-desc axis-desc">يستكشف مدى استخدام الجمعية للأدوات التكنولوجية الذكية في
+                            نشاطها البيئي.
+                        </p>
+                        <div class="interview-question" data-q="س20">
+                            <p class="q-text"><strong>س20.</strong> هل تستخدم الجمعية أدوات تكنولوجية ذكية في أنشطتها؟
+                                (تطبيقات، QR
+                                codes، خرائط تفاعلية، بث مباشر...)</p>
+                            <div class="recorder-box" id="rec-s20"></div>
+                        </div>
+                        <div class="interview-question" data-q="س21">
+                            <p class="q-text"><strong>س21.</strong> هل ترون أن التكنولوجيا الذكية يمكن أن تُسهم في تعزيز
+                                فعالية
+                                الأنشطة البيئية والوصول إلى جمهور أوسع؟</p>
+                            <div class="recorder-box" id="rec-s21"></div>
+                        </div>
+                        <div class="interview-question" data-q="س22">
+                            <p class="q-text"><strong>س22.</strong> ما هي الأدوات التكنولوجية التي تطمحون لتوظيفها
+                                مستقبلاً في عمل
+                                الجمعية؟</p>
+                            <div class="recorder-box" id="rec-s22"></div>
+                        </div>
+                        <div class="interview-question" data-q="س23">
+                            <p class="q-text"><strong>س23.</strong> هل تلعب التكنولوجيا الذكية دورًا وسيطًا بين ممارسات
+                                التسويق
+                                الأخضر وتحسين الصورة الذهنية؟ كيف تفسّرون ذلك؟</p>
+                            <div class="recorder-box" id="rec-s23"></div>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="btn-prev" onclick="prevSection('employee', 6)">→ السابق</button>
+                            <button class="btn-next glow-btn" onclick="nextSection('employee', 6)">التالي ←</button>
+                        </div>
+                    </div>
+
+                    <!-- Section 7: Axis 6 - التحديات والآفاق -->
+                    <div class="survey-section" data-section="7">
+                        <div class="section-title">
+                            <span class="section-number">07</span>
+                            <h3>المحور السادس: التحديات والآفاق المستقبلية</h3>
+                        </div>
+                        <div class="interview-question" data-q="س24">
+                            <p class="q-text"><strong>س24.</strong> ما هي أبرز الصعوبات والتحديات التي تواجه الجمعية في
+                                تنفيذ
+                                أنشطتها البيئية؟ (مالية، بشرية، تنظيمية، قانونية...)</p>
+                            <div class="recorder-box" id="rec-s24"></div>
+                        </div>
+                        <div class="interview-question" data-q="س25">
+                            <p class="q-text"><strong>س25.</strong> ما هي العوائق التي تحول دون استخدام أمثل للتكنولوجيا
+                                الذكية في
+                                عمل الجمعية؟</p>
+                            <div class="recorder-box" id="rec-s25"></div>
+                        </div>
+                        <div class="interview-question" data-q="س26">
+                            <p class="q-text"><strong>س26.</strong> ما هي المشاريع والطموحات المستقبلية للجمعية في مجال
+                                التسويق
+                                الأخضر والتوعية البيئية؟</p>
+                            <div class="recorder-box" id="rec-s26"></div>
+                        </div>
+                        <div class="interview-question" data-q="س27">
+                            <p class="q-text"><strong>س27.</strong> هل لديكم أي إضافة أو ملاحظة تودّون مشاركتها حول
+                                موضوع الدراسة؟
+                            </p>
+                            <div class="recorder-box" id="rec-s27"></div>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="btn-prev" onclick="prevSection('employee', 7)">→ السابق</button>
+                            <button class="btn-next glow-btn" onclick="nextSection('employee', 7)">التالي ←</button>
+                        </div>
+                    </div>
+
+                    <!-- Section 8: Review & Export -->
+                    <div class="survey-section" data-section="8">
+                        <div class="section-title">
+                            <span class="section-number">08</span>
+                            <h3>مراجعة وتصدير المقابلة</h3>
+                        </div>
+                        <p class="section-desc">راجع التسجيلات والنصوص قبل الحفظ:</p>
+                        <div id="interview-review"></div>
+                        <div class="nav-buttons">
+                            <button class="btn-prev" onclick="prevSection('employee', 8)">→ السابق</button>
+                            <button class="btn-submit glow-btn" onclick="saveInterview()">💾 حفظ المقابلة</button>
                         </div>
                     </div>
                 </div>
@@ -695,16 +1017,23 @@
                     <div class="admin-settings-section glass-panel" style="margin-bottom: 20px; padding: 20px;">
                         <h3>⚙️ إعدادات البحث</h3>
                         <div class="input-group" style="margin-bottom: 15px;">
-                            <label style="display:block; margin-bottom: 5px;">اسم الطالب(ة) الباحث(ة):</label>
-                            <input type="text" id="admin-student-name"
-                                style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: inherit;">
+                            <label style="display:block; margin-bottom: 5px;">اسم الطالبة الأولى:</label>
+                            <input type="text" id="admin-student-name-1"
+                                style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: inherit; font-family: 'Tajawal', sans-serif;">
                         </div>
                         <div class="input-group" style="margin-bottom: 15px;">
-                            <label style="display:block; margin-bottom: 5px;">اسم الأستاذ(ة) المشرف(ة):</label>
-                            <input type="text" id="admin-supervisor-name"
-                                style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: inherit;">
+                            <label style="display:block; margin-bottom: 5px;">اسم الطالبة الثانية:</label>
+                            <input type="text" id="admin-student-name-2"
+                                style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: inherit; font-family: 'Tajawal', sans-serif;">
                         </div>
-                        <button class="glow-btn" onclick="saveAdminSettings()">حفظ الإعدادات</button>
+                        <div class="input-group" style="margin-bottom: 15px;">
+                            <label style="display:block; margin-bottom: 5px;">اسم الدكتورة المشرفة:</label>
+                            <input type="text" id="admin-supervisor-name"
+                                style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: inherit; font-family: 'Tajawal', sans-serif;">
+                        </div>
+                        <button class="btn-primary glow-btn" onclick="saveAdminSettings()"
+                            style="padding: 10px 20px; border:none; border-radius:8px; cursor:pointer;">حفظ
+                            الإعدادات</button>
                     </div>
 
                     <div class="stats-grid">
@@ -714,9 +1043,109 @@
                             <div class="stat-label">تفاعلات المواطنين</div>
                         </div>
                         <div class="stat-card glass-card">
-                            <div class="stat-icon">🤝</div>
+                            <div class="stat-icon">🎙️</div>
                             <div class="stat-number" id="employee-count">0</div>
-                            <div class="stat-label">مساهمات الأعضاء</div>
+                            <div class="stat-label">مقابلات مسجلة</div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Dashboard Section -->
+                    <div class="chart-section" style="margin-bottom: 20px;">
+                        <h3 style="margin-bottom: 20px;">📊 لوحة المؤشرات والإحصائيات التحليلية</h3>
+
+                        <div class="charts-grid"
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+
+                            <!-- Chart 1: Demographics: Age -->
+                            <div class="glass-panel" style="padding: 15px;">
+                                <h4
+                                    style="text-align: center; margin-bottom: 10px; font-size: 1.1em; color: var(--primary-color);">
+                                    الفئة العمرية</h4>
+                                <div style="position: relative; height: 250px; width: 100%;"><canvas
+                                        id="chart-age"></canvas></div>
+                            </div>
+
+                            <!-- Chart 2: Demographics: Education -->
+                            <div class="glass-panel" style="padding: 15px;">
+                                <h4
+                                    style="text-align: center; margin-bottom: 10px; font-size: 1.1em; color: var(--primary-color);">
+                                    المستوى التعليمي</h4>
+                                <div style="position: relative; height: 250px; width: 100%;"><canvas
+                                        id="chart-edu"></canvas></div>
+                            </div>
+
+                            <!-- Chart 3: Demographics: Residence -->
+                            <div class="glass-panel" style="padding: 15px;">
+                                <h4
+                                    style="text-align: center; margin-bottom: 10px; font-size: 1.1em; color: var(--primary-color);">
+                                    مكان الإقامة</h4>
+                                <div style="position: relative; height: 250px; width: 100%;"><canvas
+                                        id="chart-residence"></canvas></div>
+                            </div>
+
+                            <!-- Chart 4: Membership -->
+                            <div class="glass-panel" style="padding: 15px;">
+                                <h4
+                                    style="text-align: center; margin-bottom: 10px; font-size: 1.1em; color: var(--primary-color);">
+                                    الانخراط في الجمعية</h4>
+                                <div style="position: relative; height: 250px; width: 100%;"><canvas
+                                        id="chart-membership"></canvas></div>
+                            </div>
+
+                            <!-- Chart 5: Discovery Source -->
+                            <div class="glass-panel" style="padding: 15px; grid-column: 1 / -1;">
+                                <h4
+                                    style="text-align: center; margin-bottom: 10px; font-size: 1.1em; color: var(--primary-color);">
+                                    كيفية التعرف على الجمعية</h4>
+                                <div style="position: relative; height: 300px; width: 100%;"><canvas
+                                        id="chart-discovery"></canvas></div>
+                            </div>
+
+                            <!-- Chart 6: Green Marketing Awareness -->
+                            <div class="glass-panel" style="padding: 15px;">
+                                <h4
+                                    style="text-align: center; margin-bottom: 10px; font-size: 1.1em; color: var(--primary-color);">
+                                    الوعي بالتسويق الأخضر</h4>
+                                <div style="position: relative; height: 250px; width: 100%;"><canvas
+                                        id="chart-green-awareness"></canvas></div>
+                            </div>
+
+                            <!-- Chart 7: Mental Image (Radar) -->
+                            <div class="glass-panel" style="padding: 15px;">
+                                <h4
+                                    style="text-align: center; margin-bottom: 10px; font-size: 1.1em; color: var(--primary-color);">
+                                    أبعاد الصورة الذهنية</h4>
+                                <div style="position: relative; height: 250px; width: 100%;"><canvas
+                                        id="chart-mental-image"></canvas></div>
+                            </div>
+
+                            <!-- Chart 8: Digital Communication -->
+                            <div class="glass-panel" style="padding: 15px;">
+                                <h4
+                                    style="text-align: center; margin-bottom: 10px; font-size: 1.1em; color: var(--primary-color);">
+                                    تقييم الاتصال الرقمي</h4>
+                                <div style="position: relative; height: 250px; width: 100%;"><canvas
+                                        id="chart-digital-comm"></canvas></div>
+                            </div>
+
+                            <!-- Chart 9: Smart Technology Acceptance -->
+                            <div class="glass-panel" style="padding: 15px;">
+                                <h4
+                                    style="text-align: center; margin-bottom: 10px; font-size: 1.1em; color: var(--primary-color);">
+                                    قبول التكنولوجيا الذكية</h4>
+                                <div style="position: relative; height: 250px; width: 100%;"><canvas
+                                        id="chart-smart-tech"></canvas></div>
+                            </div>
+
+                            <!-- Chart 10: Overall Satisfaction & Drift -->
+                            <div class="glass-panel" style="padding: 15px; grid-column: 1 / -1;">
+                                <h4
+                                    style="text-align: center; margin-bottom: 10px; font-size: 1.1em; color: var(--primary-color);">
+                                    تحليل الاهتمام العام والميول (Drift & Interest)</h4>
+                                <div style="position: relative; height: 300px; width: 100%;"><canvas
+                                        id="chart-drift"></canvas></div>
+                            </div>
+
                         </div>
                     </div>
                     <div class="export-section">
@@ -783,6 +1212,7 @@
     </svg>
 
     <script src="app.js"></script>
+    <script src="recorder.js"></script>
     <script src="background.js"></script>
 </body>
 
