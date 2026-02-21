@@ -85,30 +85,40 @@
         recognition.continuous = true;
         recognition.interimResults = true;
 
-        let finalTranscript = state.transcript || '';
+        // "Committed" part is what was there BEFORE this current recognition session started
+        const committedText = state.transcript || '';
         const textArea = document.getElementById(`transcript-${qId}`);
 
         recognition.onstart = () => {
             console.log(`[Diagnostic q${qId}] Speech recognition started.`);
         };
-        recognition.onaudiostart = () => console.log(`[Diagnostic q${qId}] Audio capturing started`);
-        recognition.onsoundstart = () => console.log(`[Diagnostic q${qId}] Sound detected`);
-        recognition.onspeechstart = () => console.log(`[Diagnostic q${qId}] Speech detected`);
 
         recognition.onresult = (event) => {
-            console.log(`[Diagnostic q${qId}] Result received!`, event);
+            // Verify this is still the active instance to avoid leakage from old runs
+            if (state.recognition !== recognition) {
+                console.log(`[Diagnostic q${qId}] ignoring result from old recognition instance`);
+                recognition.stop();
+                return;
+            }
+
+            let sessionFinal = '';
             let interim = '';
+
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 const t = event.results[i][0].transcript;
                 if (event.results[i].isFinal) {
-                    finalTranscript += t + ' ';
+                    sessionFinal += t + ' ';
                 } else {
                     interim += t;
                 }
             }
-            const fullText = (finalTranscript + interim).trim();
-            textArea.value = fullText;
-            state.transcript = fullText;
+
+            // The full text is what we had before (committed) + what we just heard (finalized in this session) + current unfinished words (interim)
+            const fullDisplay = (committedText + ' ' + sessionFinal + interim).replace(/\s+/g, ' ').trim();
+            textArea.value = fullDisplay;
+
+            // Sync state.transcript ONLY with finalized bits to prevent pollutions
+            state.transcript = (committedText + ' ' + sessionFinal).replace(/\s+/g, ' ').trim();
         };
 
         recognition.onerror = (event) => {
@@ -123,30 +133,28 @@
                 alert('خطأ في التقاط الصوت: المتصفح لا يستطيع قراءة الميكروفون (ربما يكون مستخدماً من تطبيق آخر مثل Zoom أو معطل في الويندوز).');
                 stopRecording(qId);
             } else if (event.error === 'no-speech') {
-                console.log(`[Diagnostic q${qId}] No speech detected. Restarting if still in recording state.`);
-                if (state.isRecording) {
-                    try { recognition.start(); } catch (e) { }
-                }
-            } else {
-                console.warn(`[Diagnostic q${qId}] Unknown error:`, event.error);
+                console.log(`[Diagnostic q${qId}] No speech detected.`);
             }
         };
 
         recognition.onend = () => {
             console.log(`[Diagnostic q${qId}] Speech recognition ended.`);
-            if (state.isRecording) {
-                console.log(`[Diagnostic q${qId}] Auto-restarting API because user hasn't pressed stop.`);
+
+            // ONLY auto-restart if we are still in recording mode 
+            // AND the instance ending is actually our official active instance.
+            if (state.isRecording && state.recognition === recognition) {
+                console.log(`[Diagnostic q${qId}] Auto-restarting API.`);
                 setTimeout(() => {
-                    if (state.isRecording) {
-                        try { recognition.start(); } catch (e) { console.error('Restart failed', e); }
+                    if (state.isRecording && state.recognition === recognition) {
+                        try { recognition.start(); } catch (e) { }
                     }
-                }, 200);
+                }, 300);
             }
         };
 
         try {
+            state.recognition = recognition; // Store BEFORE starting
             recognition.start();
-            state.recognition = recognition;
         } catch (err) {
             console.error('Failed to start transcription:', err);
         }
@@ -172,10 +180,11 @@
     function stopRecording(qId) {
         const state = recorders[qId];
 
+        state.isRecording = false;
         if (state.recognition) {
             state.recognition.stop();
+            state.recognition = null; // Clear the ref immediately
         }
-        state.isRecording = false;
         clearInterval(state._timerInterval);
 
         const btn = document.querySelector(`.rec-btn[data-q="${qId}"]`);
@@ -196,13 +205,15 @@
             b.classList.toggle('active', b.dataset.lang === lang);
         });
 
-        // If currently transcribing, restart it to apply new lang instantly
-        if (state.isRecording && state.recognition) {
-            state.recognition.stop();
-            // onend tries to auto-restart, but we speed it up here
+        // If currently transcribing, kill the old instance and start a fresh one for the new lang
+        if (state.isRecording) {
+            if (state.recognition) {
+                state.recognition.stop();
+                state.recognition = null; // Prevents onend from auto-restarting the old instance
+            }
             setTimeout(() => {
                 if (state.isRecording) startTranscriptionOnly(qId);
-            }, 200);
+            }, 350);
         }
     };
 
