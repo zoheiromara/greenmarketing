@@ -73,87 +73,87 @@
     function startTranscriptionOnly(qId) {
         const state = recorders[qId];
 
-        // Start Speech Recognition
+        // Web Speech API check
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
             alert('عذراً، متصفحك لا يدعم تحويل الصوت إلى نص. يرجى استخدام Google Chrome.');
             return;
         }
 
+        // We use non-continuous mode for Mobile robustness
+        // Mobile Chrome often duplicates results when continuous is true.
         const recognition = new SpeechRecognition();
         recognition.lang = state.lang;
-        recognition.continuous = true;
+        recognition.continuous = false; // Fresh sessions per sentence
         recognition.interimResults = true;
 
-        // "Committed" part is what was there BEFORE this current recognition session started
-        const committedText = state.transcript || '';
         const textArea = document.getElementById(`transcript-${qId}`);
 
         recognition.onstart = () => {
-            console.log(`[Diagnostic q${qId}] Speech recognition started.`);
+            console.log(`[Diagnostic q${qId}] Fresh session started.`);
         };
 
         recognition.onresult = (event) => {
-            // Verify this is still the active instance to avoid leakage from old runs
-            if (state.recognition !== recognition) {
-                console.log(`[Diagnostic q${qId}] ignoring result from old recognition instance`);
-                recognition.stop();
-                return;
-            }
+            if (state.recognition !== recognition) return;
 
-            let sessionFinal = '';
             let interim = '';
+            let final = '';
 
             for (let i = event.resultIndex; i < event.results.length; i++) {
-                const t = event.results[i][0].transcript;
+                const transcript = event.results[i][0].transcript;
                 if (event.results[i].isFinal) {
-                    sessionFinal += t + ' ';
+                    final += transcript;
                 } else {
-                    interim += t;
+                    interim += transcript;
                 }
             }
 
-            // The full text is what we had before (committed) + what we just heard (finalized in this session) + current unfinished words (interim)
-            const fullDisplay = (committedText + ' ' + sessionFinal + interim).replace(/\s+/g, ' ').trim();
-            textArea.value = fullDisplay;
-
-            // Sync state.transcript ONLY with finalized bits to prevent pollutions
-            state.transcript = (committedText + ' ' + sessionFinal).replace(/\s+/g, ' ').trim();
-        };
-
-        recognition.onerror = (event) => {
-            console.error(`[Diagnostic q${qId}] Speech recognition error:`, event.error);
-            if (event.error === 'not-allowed') {
-                alert('المنع الإعدادي: الرجاء السماح للمتصفح باستخدام الميكروفون للتفريغ الصوتي.');
-                stopRecording(qId);
-            } else if (event.error === 'network') {
-                alert('خطأ في الشبكة: خدمة التفريغ الصوتي (Google Speech API) تتطلب اتصالاً بالإنترنت لاستدامتها أو ربما محجوبة في الشبكة الحالية.');
-                stopRecording(qId);
-            } else if (event.error === 'audio-capture') {
-                alert('خطأ في التقاط الصوت: المتصفح لا يستطيع قراءة الميكروفون (ربما يكون مستخدماً من تطبيق آخر مثل Zoom أو معطل في الويندوز).');
-                stopRecording(qId);
-            } else if (event.error === 'no-speech') {
-                console.log(`[Diagnostic q${qId}] No speech detected.`);
+            if (final) {
+                appendUniqueText(qId, final);
+                // On mobile, stopping and starting a fresh session is more reliable than 'continuous: true'
+                recognition.stop();
+            } else {
+                // For interim (while speaking), we just show the view temporarily
+                const baseText = state.transcript || '';
+                textArea.value = (baseText + ' ' + interim).trim().replace(/\s+/g, ' ');
             }
         };
 
-        recognition.onend = () => {
-            console.log(`[Diagnostic q${qId}] Speech recognition ended.`);
+        // Guard against word duplication by checking the end of the current transcript
+        function appendUniqueText(qId, newText) {
+            const current = (state.transcript || '').trim();
+            const incoming = newText.trim();
 
-            // ONLY auto-restart if we are still in recording mode 
-            // AND the instance ending is actually our official active instance.
+            // Basic deduplication: if the exact string was just added, skip it
+            if (current.endsWith(incoming)) {
+                console.log(`[Diagnostic q${qId}] Duplicate phrase detected, skipping append.`);
+                return;
+            }
+
+            const updated = (current + ' ' + incoming).trim().replace(/\s+/g, ' ');
+            state.transcript = updated;
+            textArea.value = updated;
+        }
+
+        recognition.onerror = (event) => {
+            console.warn(`[Diagnostic q${qId}] Recognition error:`, event.error);
+            if (event.error === 'not-allowed') stopRecording(qId);
+        };
+
+        recognition.onend = () => {
+            console.log(`[Diagnostic q${qId}] Session ended.`);
+            // Auto-restart immediately if we are still in "Recording" mode
             if (state.isRecording && state.recognition === recognition) {
-                console.log(`[Diagnostic q${qId}] Auto-restarting API.`);
                 setTimeout(() => {
-                    if (state.isRecording && state.recognition === recognition) {
+                    if (state.isRecording) {
                         try { recognition.start(); } catch (e) { }
                     }
-                }, 300);
+                }, 100);
             }
         };
 
         try {
-            state.recognition = recognition; // Store BEFORE starting
+            state.recognition = recognition;
             recognition.start();
         } catch (err) {
             console.error('Failed to start transcription:', err);
