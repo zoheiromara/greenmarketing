@@ -4,9 +4,17 @@ import uuid
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-from dotenv import load_dotenv
 from flask import Flask, jsonify, request, send_from_directory
-from supabase import create_client
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    def load_dotenv(*_args, **_kwargs):
+        return False
+
+try:
+    from supabase import create_client
+except ImportError:
+    create_client = None
 
 load_dotenv()
 
@@ -65,7 +73,9 @@ SUPABASE_URL = os.getenv("SUPABASE_URL", "https://ppnumoljvvpwtjmsbbuc.supabase.
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "sb_publishable_5Lr6I1qsN0B5hMqBM6cHWQ_bcf8oE1g")
 
 supabase = None
-if SUPABASE_URL and SUPABASE_KEY:
+if create_client is None:
+    print("Supabase package is not installed; remote storage disabled.")
+elif SUPABASE_URL and SUPABASE_KEY:
     try:
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     except Exception as exc:
