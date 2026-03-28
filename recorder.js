@@ -263,9 +263,18 @@
                 body: JSON.stringify(interviewData)
             });
 
-            const result = await response.json();
-            if (!response.ok || !result.success) {
-                throw new Error(result.error || 'Save failed');
+            const result = typeof window.parseApiResponse === 'function'
+                ? await window.parseApiResponse(response)
+                : await response.json().catch(() => null);
+            if (!response.ok || !result?.success) {
+                const message = typeof window.getApiErrorMessage === 'function'
+                    ? window.getApiErrorMessage(response, result, 'Failed to save interview')
+                    : (result?.error || `HTTP ${response.status}`);
+                throw new Error(message);
+            }
+
+            if (Array.isArray(result?.warnings) && result.warnings.length) {
+                console.warn('Interview saved with warnings', result.warnings, result.storage_details);
             }
 
             if (typeof updateStats === 'function') await updateStats();

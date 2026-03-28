@@ -13,7 +13,38 @@ STUDY_CODE = "cntpp_green_marketing_2026"
 QUESTIONNAIRE_TYPE = "cntpp_questionnaire"
 
 APP_ROOT = Path(__file__).resolve().parent
-DATA_ROOT = APP_ROOT / "data"
+
+
+def _can_write_to_directory(path: Path) -> bool:
+    try:
+        path.mkdir(parents=True, exist_ok=True)
+        probe = path / ".write_probe"
+        probe.write_text("ok", encoding="utf-8")
+        probe.unlink(missing_ok=True)
+        return True
+    except Exception:
+        return False
+
+
+def _resolve_data_root() -> tuple[Path, str]:
+    configured_root = os.getenv("APP_DATA_DIR") or os.getenv("FORM_DATA_DIR")
+    candidates: list[tuple[Path, str]] = []
+
+    if configured_root:
+        candidates.append((Path(configured_root).expanduser(), "env"))
+
+    candidates.append((APP_ROOT / "data", "app"))
+    candidates.append((Path.home() / ".cntpp_green_marketing" / "data", "home"))
+
+    for candidate, source in candidates:
+        if _can_write_to_directory(candidate):
+            return candidate, source
+
+    attempted_paths = ", ".join(str(path) for path, _ in candidates)
+    raise RuntimeError(f"No writable data directory found. Tried: {attempted_paths}")
+
+
+DATA_ROOT, DATA_ROOT_SOURCE = _resolve_data_root()
 QUESTIONNAIRE_DIR = DATA_ROOT / "questionnaire"
 INTERVIEW_DIR = DATA_ROOT / "interviews"
 
@@ -63,6 +94,61 @@ def _save_questionnaire_local(payload: dict) -> None:
 
 def _save_interview_local(payload: dict) -> None:
     _write_local_json(INTERVIEW_DIR / f"{payload['id']}.json", payload)
+
+
+def _storage_status() -> dict:
+    return {
+        "data_root": str(DATA_ROOT),
+        "data_root_source": DATA_ROOT_SOURCE,
+        "questionnaire_dir": str(QUESTIONNAIRE_DIR),
+        "interview_dir": str(INTERVIEW_DIR),
+        "data_root_writable": _can_write_to_directory(DATA_ROOT)
+    }
+
+
+def _build_save_response(
+    *,
+    kind: str,
+    local_saved: bool,
+    remote_saved: bool,
+    local_error: str | None = None,
+    remote_error: str | None = None,
+):
+    if not local_saved and not remote_saved:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to save {kind}",
+            "details": {
+                "local_error": local_error,
+                "remote_error": remote_error,
+                "storage": _storage_status()
+            }
+        }), 500
+
+    storage_targets = []
+    warnings = []
+
+    if remote_saved:
+        storage_targets.append("supabase")
+    elif remote_error:
+        warnings.append(f"Remote save failed: {remote_error}")
+
+    if local_saved:
+        storage_targets.append("local")
+    elif local_error:
+        warnings.append(f"Local save failed: {local_error}")
+
+    response_payload = {
+        "success": True,
+        "message": f"{kind.title()} saved successfully",
+        "storage": "+".join(storage_targets),
+        "storage_details": _storage_status()
+    }
+
+    if warnings:
+        response_payload["warnings"] = warnings
+
+    return jsonify(response_payload), 200
 
 
 def _save_questionnaire_remote(payload: dict) -> None:
@@ -130,7 +216,8 @@ def health():
     return jsonify({
         "success": True,
         "study": STUDY_CODE,
-        "supabase_enabled": supabase is not None
+        "supabase_enabled": supabase is not None,
+        "storage": _storage_status()
     }), 200
 
 
@@ -148,19 +235,30 @@ def save_survey():
         payload["study"] = STUDY_CODE
 
         remote_saved = False
+        remote_error = None
         try:
             _save_questionnaire_remote(payload)
             remote_saved = True
         except Exception as exc:
+            remote_error = str(exc)
             print(f"Remote questionnaire save failed: {exc}")
 
-        _save_questionnaire_local(payload)
+        local_saved = False
+        local_error = None
+        try:
+            _save_questionnaire_local(payload)
+            local_saved = True
+        except Exception as exc:
+            local_error = str(exc)
+            print(f"Local questionnaire save failed: {exc}")
 
-        return jsonify({
-            "success": True,
-            "message": "Questionnaire saved successfully",
-            "storage": "supabase+local" if remote_saved else "local"
-        }), 200
+        return _build_save_response(
+            kind="questionnaire",
+            local_saved=local_saved,
+            remote_saved=remote_saved,
+            local_error=local_error,
+            remote_error=remote_error,
+        )
     except Exception as exc:
         print(f"Questionnaire save error: {exc}")
         return jsonify({"error": str(exc)}), 500
@@ -177,19 +275,30 @@ def save_interview():
         payload["study"] = STUDY_CODE
 
         remote_saved = False
+        remote_error = None
         try:
             _save_interview_remote(payload)
             remote_saved = True
         except Exception as exc:
+            remote_error = str(exc)
             print(f"Remote interview save failed: {exc}")
 
-        _save_interview_local(payload)
+        local_saved = False
+        local_error = None
+        try:
+            _save_interview_local(payload)
+            local_saved = True
+        except Exception as exc:
+            local_error = str(exc)
+            print(f"Local interview save failed: {exc}")
 
-        return jsonify({
-            "success": True,
-            "message": "Interview saved successfully",
-            "storage": "supabase+local" if remote_saved else "local"
-        }), 200
+        return _build_save_response(
+            kind="interview",
+            local_saved=local_saved,
+            remote_saved=remote_saved,
+            local_error=local_error,
+            remote_error=remote_error,
+        )
     except Exception as exc:
         print(f"Interview save error: {exc}")
         return jsonify({"error": str(exc)}), 500

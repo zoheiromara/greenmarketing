@@ -456,6 +456,38 @@ function collectFormData(container) {
     return data;
 }
 
+async function parseApiResponse(response) {
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+        return null;
+    }
+
+    try {
+        return await response.json();
+    } catch (error) {
+        console.warn('Failed to parse API response', error);
+        return null;
+    }
+}
+
+function getApiErrorMessage(response, result, fallback = 'Request failed') {
+    const localError = result?.details?.local_error;
+    const remoteError = result?.details?.remote_error;
+
+    if (localError && remoteError) {
+        return `Local save failed: ${localError}. Remote save failed: ${remoteError}`;
+    }
+
+    if (localError) return `Local save failed: ${localError}`;
+    if (remoteError) return `Remote save failed: ${remoteError}`;
+    if (result?.error) return result.error;
+    if (response?.status) return `HTTP ${response.status}`;
+    return fallback;
+}
+
+window.parseApiResponse = parseApiResponse;
+window.getApiErrorMessage = getApiErrorMessage;
+
 async function submitQuestionnaire() {
     const lastSection = QUESTIONNAIRE_SECTIONS.length;
     if (!validateCurrentSection('questionnaire', lastSection)) return;
@@ -481,14 +513,20 @@ async function saveQuestionnaire(payload) {
             body: JSON.stringify({ type: SURVEY_TYPE, payload })
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+        const result = await parseApiResponse(response);
+        if (!response.ok || !result?.success) {
+            throw new Error(getApiErrorMessage(response, result, 'Failed to save questionnaire'));
+        }
+
+        if (Array.isArray(result?.warnings) && result.warnings.length) {
+            console.warn('Questionnaire saved with warnings', result.warnings, result.storage_details);
         }
 
         await updateStats();
         return true;
     } catch (error) {
         console.error('Failed to save survey', error);
+        alert(`تعذر حفظ الاستبيان: ${error.message}`);
         showToast('تعذر حفظ الاستبيان في هذه اللحظة', 'error');
         return false;
     }
