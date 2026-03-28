@@ -2,6 +2,7 @@ import json
 import os
 import uuid
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request, send_from_directory
@@ -20,15 +21,18 @@ def _can_write_to_directory(path: Path) -> bool:
         path.mkdir(parents=True, exist_ok=True)
         probe = path / ".write_probe"
         probe.write_text("ok", encoding="utf-8")
-        probe.unlink(missing_ok=True)
+        try:
+            probe.unlink()
+        except FileNotFoundError:
+            pass
         return True
     except Exception:
         return False
 
 
-def _resolve_data_root() -> tuple[Path, str]:
+def _resolve_data_root() -> Tuple[Path, str]:
     configured_root = os.getenv("APP_DATA_DIR") or os.getenv("FORM_DATA_DIR")
-    candidates: list[tuple[Path, str]] = []
+    candidates = []  # type: List[Tuple[Path, str]]
 
     if configured_root:
         candidates.append((Path(configured_root).expanduser(), "env"))
@@ -68,11 +72,11 @@ if SUPABASE_URL and SUPABASE_KEY:
         print(f"Supabase initialization failed: {exc}")
 
 
-def _write_local_json(path: Path, payload: dict) -> None:
+def _write_local_json(path: Path, payload: Dict) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def _read_local_collection(directory: Path) -> list[dict]:
+def _read_local_collection(directory: Path) -> List[Dict]:
     records = []
     if not directory.exists():
         return records
@@ -84,7 +88,7 @@ def _read_local_collection(directory: Path) -> list[dict]:
     return records
 
 
-def _merge_records(*collections: list[dict]) -> list[dict]:
+def _merge_records(*collections: List[Dict]) -> List[Dict]:
     merged = {}
     for collection in collections:
         for record in collection:
@@ -94,15 +98,15 @@ def _merge_records(*collections: list[dict]) -> list[dict]:
     return list(merged.values())
 
 
-def _save_questionnaire_local(payload: dict) -> None:
+def _save_questionnaire_local(payload: Dict) -> None:
     _write_local_json(QUESTIONNAIRE_DIR / f"{payload['id']}.json", payload)
 
 
-def _save_interview_local(payload: dict) -> None:
+def _save_interview_local(payload: Dict) -> None:
     _write_local_json(INTERVIEW_DIR / f"{payload['id']}.json", payload)
 
 
-def _storage_status() -> dict:
+def _storage_status() -> Dict:
     return {
         "data_root": str(DATA_ROOT),
         "data_root_source": DATA_ROOT_SOURCE,
@@ -119,8 +123,8 @@ def _build_save_response(
     kind: str,
     local_saved: bool,
     remote_saved: bool,
-    local_error: str | None = None,
-    remote_error: str | None = None,
+    local_error: Optional[str] = None,
+    remote_error: Optional[str] = None,
 ):
     if not local_saved and not remote_saved:
         return jsonify({
@@ -159,7 +163,7 @@ def _build_save_response(
     return jsonify(response_payload), 200
 
 
-def _save_questionnaire_remote(payload: dict) -> None:
+def _save_questionnaire_remote(payload: Dict) -> None:
     if supabase is None:
         raise RuntimeError("Supabase client is not available")
 
@@ -170,7 +174,7 @@ def _save_questionnaire_remote(payload: dict) -> None:
     }).execute()
 
 
-def _save_interview_remote(payload: dict) -> None:
+def _save_interview_remote(payload: Dict) -> None:
     if supabase is None:
         raise RuntimeError("Supabase client is not available")
 
@@ -180,14 +184,14 @@ def _save_interview_remote(payload: dict) -> None:
     }).execute()
 
 
-def _load_local_records(primary_directory: Path, legacy_directory: Path) -> list[dict]:
+def _load_local_records(primary_directory: Path, legacy_directory: Path) -> List[Dict]:
     collections = [_read_local_collection(primary_directory)]
     if legacy_directory != primary_directory:
         collections.append(_read_local_collection(legacy_directory))
     return _merge_records(*collections)
 
 
-def _load_questionnaires() -> list[dict]:
+def _load_questionnaires() -> List[Dict]:
     local_records = _load_local_records(QUESTIONNAIRE_DIR, LEGACY_QUESTIONNAIRE_DIR)
     remote_records = []
 
@@ -204,7 +208,7 @@ def _load_questionnaires() -> list[dict]:
     return _merge_records(local_records, remote_records)
 
 
-def _load_interviews() -> list[dict]:
+def _load_interviews() -> List[Dict]:
     local_records = _load_local_records(INTERVIEW_DIR, LEGACY_INTERVIEW_DIR)
     remote_records = []
 
