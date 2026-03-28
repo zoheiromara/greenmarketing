@@ -47,11 +47,15 @@ def _resolve_data_root() -> tuple[Path, str]:
 DATA_ROOT, DATA_ROOT_SOURCE = _resolve_data_root()
 QUESTIONNAIRE_DIR = DATA_ROOT / "questionnaire"
 INTERVIEW_DIR = DATA_ROOT / "interviews"
+LEGACY_DATA_ROOT = APP_ROOT / "data"
+LEGACY_QUESTIONNAIRE_DIR = LEGACY_DATA_ROOT / "questionnaire"
+LEGACY_INTERVIEW_DIR = LEGACY_DATA_ROOT / "interviews"
 
 for directory in (QUESTIONNAIRE_DIR, INTERVIEW_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 app = Flask(__name__, static_url_path="", static_folder=str(APP_ROOT))
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://ppnumoljvvpwtjmsbbuc.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "sb_publishable_5Lr6I1qsN0B5hMqBM6cHWQ_bcf8oE1g")
@@ -70,6 +74,8 @@ def _write_local_json(path: Path, payload: dict) -> None:
 
 def _read_local_collection(directory: Path) -> list[dict]:
     records = []
+    if not directory.exists():
+        return records
     for file_path in sorted(directory.glob("*.json")):
         try:
             records.append(json.loads(file_path.read_text(encoding="utf-8")))
@@ -102,7 +108,9 @@ def _storage_status() -> dict:
         "data_root_source": DATA_ROOT_SOURCE,
         "questionnaire_dir": str(QUESTIONNAIRE_DIR),
         "interview_dir": str(INTERVIEW_DIR),
-        "data_root_writable": _can_write_to_directory(DATA_ROOT)
+        "data_root_writable": _can_write_to_directory(DATA_ROOT),
+        "legacy_data_root": str(LEGACY_DATA_ROOT),
+        "legacy_data_root_loaded": LEGACY_DATA_ROOT != DATA_ROOT and LEGACY_DATA_ROOT.exists()
     }
 
 
@@ -172,8 +180,15 @@ def _save_interview_remote(payload: dict) -> None:
     }).execute()
 
 
+def _load_local_records(primary_directory: Path, legacy_directory: Path) -> list[dict]:
+    collections = [_read_local_collection(primary_directory)]
+    if legacy_directory != primary_directory:
+        collections.append(_read_local_collection(legacy_directory))
+    return _merge_records(*collections)
+
+
 def _load_questionnaires() -> list[dict]:
-    local_records = _read_local_collection(QUESTIONNAIRE_DIR)
+    local_records = _load_local_records(QUESTIONNAIRE_DIR, LEGACY_QUESTIONNAIRE_DIR)
     remote_records = []
 
     if supabase is not None:
@@ -190,7 +205,7 @@ def _load_questionnaires() -> list[dict]:
 
 
 def _load_interviews() -> list[dict]:
-    local_records = _read_local_collection(INTERVIEW_DIR)
+    local_records = _load_local_records(INTERVIEW_DIR, LEGACY_INTERVIEW_DIR)
     remote_records = []
 
     if supabase is not None:
@@ -209,6 +224,16 @@ def _load_interviews() -> list[dict]:
 @app.route("/")
 def serve_index():
     return send_from_directory(str(APP_ROOT), "index.html")
+
+
+@app.after_request
+def add_cache_headers(response):
+    cache_sensitive_suffixes = (".html", ".js", ".css")
+    if request.path == "/" or request.path.endswith(cache_sensitive_suffixes):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
 
 
 @app.route("/api/health", methods=["GET"])
