@@ -1,96 +1,213 @@
-import os
 import json
+import os
 import uuid
-from flask import Flask, request, jsonify, send_from_directory
-from supabase import create_client, Client
+from pathlib import Path
 
-app = Flask(__name__, static_url_path='', static_folder='.')
+from dotenv import load_dotenv
+from flask import Flask, jsonify, request, send_from_directory
+from supabase import create_client
 
-# Supabase Credentials
-SUPABASE_URL = "https://ppnumoljvvpwtjmsbbuc.supabase.co"
-SUPABASE_KEY = "sb_publishable_5Lr6I1qsN0B5hMqBM6cHWQ_bcf8oE1g" # NOTE: Using Service Role Key is recommended for server-side
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+load_dotenv()
 
-@app.route('/')
-def serve_index():
-    return send_from_directory('.', 'index.html')
+STUDY_CODE = "cntpp_green_marketing_2026"
+QUESTIONNAIRE_TYPE = "cntpp_questionnaire"
 
-@app.route('/api/save_interview', methods=['POST'])
-def save_interview():
+APP_ROOT = Path(__file__).resolve().parent
+DATA_ROOT = APP_ROOT / "data"
+QUESTIONNAIRE_DIR = DATA_ROOT / "questionnaire"
+INTERVIEW_DIR = DATA_ROOT / "interviews"
+
+for directory in (QUESTIONNAIRE_DIR, INTERVIEW_DIR):
+    directory.mkdir(parents=True, exist_ok=True)
+
+app = Flask(__name__, static_url_path="", static_folder=str(APP_ROOT))
+
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://ppnumoljvvpwtjmsbbuc.supabase.co")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "sb_publishable_5Lr6I1qsN0B5hMqBM6cHWQ_bcf8oE1g")
+
+supabase = None
+if SUPABASE_URL and SUPABASE_KEY:
     try:
-        data = request.json
-        if not data or 'id' not in data:
-            return jsonify({'error': 'Invalid data format'}), 400
+        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    except Exception as exc:
+        print(f"Supabase initialization failed: {exc}")
 
-        interview_id = data['id']
 
-        # Save to Supabase
-        response = supabase.table('interviews').upsert({
-            'id': interview_id,
-            'payload': data
-        }).execute()
+def _write_local_json(path: Path, payload: dict) -> None:
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
-        return jsonify({'success': True, 'message': 'Interview saved to Supabase'}), 200
 
-    except Exception as e:
-        print(f"Supabase error: {e}")
-        return jsonify({'error': str(e)}), 500
+def _read_local_collection(directory: Path) -> list[dict]:
+    records = []
+    for file_path in sorted(directory.glob("*.json")):
+        try:
+            records.append(json.loads(file_path.read_text(encoding="utf-8")))
+        except Exception as exc:
+            print(f"Failed to read {file_path}: {exc}")
+    return records
 
-@app.route('/api/save_survey', methods=['POST'])
+
+def _merge_records(*collections: list[dict]) -> list[dict]:
+    merged = {}
+    for collection in collections:
+        for record in collection:
+            record_id = record.get("id")
+            if record_id:
+                merged[record_id] = record
+    return list(merged.values())
+
+
+def _save_questionnaire_local(payload: dict) -> None:
+    _write_local_json(QUESTIONNAIRE_DIR / f"{payload['id']}.json", payload)
+
+
+def _save_interview_local(payload: dict) -> None:
+    _write_local_json(INTERVIEW_DIR / f"{payload['id']}.json", payload)
+
+
+def _save_questionnaire_remote(payload: dict) -> None:
+    if supabase is None:
+        raise RuntimeError("Supabase client is not available")
+
+    supabase.table("surveys").upsert({
+        "id": payload["id"],
+        "type": QUESTIONNAIRE_TYPE,
+        "payload": payload
+    }).execute()
+
+
+def _save_interview_remote(payload: dict) -> None:
+    if supabase is None:
+        raise RuntimeError("Supabase client is not available")
+
+    supabase.table("interviews").upsert({
+        "id": payload["id"],
+        "payload": payload
+    }).execute()
+
+
+def _load_questionnaires() -> list[dict]:
+    local_records = _read_local_collection(QUESTIONNAIRE_DIR)
+    remote_records = []
+
+    if supabase is not None:
+        try:
+            response = supabase.table("surveys").select("*").eq("type", QUESTIONNAIRE_TYPE).execute()
+            remote_records = [
+                row["payload"] for row in (response.data or [])
+                if isinstance(row.get("payload"), dict) and row["payload"].get("study") == STUDY_CODE
+            ]
+        except Exception as exc:
+            print(f"Supabase questionnaire fetch failed: {exc}")
+
+    return _merge_records(local_records, remote_records)
+
+
+def _load_interviews() -> list[dict]:
+    local_records = _read_local_collection(INTERVIEW_DIR)
+    remote_records = []
+
+    if supabase is not None:
+        try:
+            response = supabase.table("interviews").select("*").execute()
+            remote_records = [
+                row["payload"] for row in (response.data or [])
+                if isinstance(row.get("payload"), dict) and row["payload"].get("study") == STUDY_CODE
+            ]
+        except Exception as exc:
+            print(f"Supabase interview fetch failed: {exc}")
+
+    return _merge_records(local_records, remote_records)
+
+
+@app.route("/")
+def serve_index():
+    return send_from_directory(str(APP_ROOT), "index.html")
+
+
+@app.route("/api/health", methods=["GET"])
+def health():
+    return jsonify({
+        "success": True,
+        "study": STUDY_CODE,
+        "supabase_enabled": supabase is not None
+    }), 200
+
+
+@app.route("/api/save_survey", methods=["POST"])
 def save_survey():
     try:
-        data = request.json
-        if not data or 'type' not in data or 'payload' not in data:
-            return jsonify({'error': 'Invalid data format'}), 400
-            
-        survey_type = data['type'] 
-        payload = data['payload']
-        
-        if 'id' not in payload:
-            payload['id'] = str(uuid.uuid4())
-            
-        # Save to Supabase (Unified surveys table)
-        response = supabase.table('surveys').upsert({
-            'id': payload['id'],
-            'type': survey_type,
-            'payload': payload
-        }).execute()
-            
-        return jsonify({'success': True, 'message': f'Survey ({survey_type}) saved to Supabase'}), 200
-        
-    except Exception as e:
-        print(f"Supabase error: {e}")
-        return jsonify({'error': str(e)}), 500
+        data = request.get_json(silent=True) or {}
+        payload = data.get("payload")
+        survey_type = data.get("type")
 
-@app.route('/api/get_surveys', methods=['GET'])
+        if survey_type != QUESTIONNAIRE_TYPE or not isinstance(payload, dict):
+            return jsonify({"error": "Invalid survey payload"}), 400
+
+        payload.setdefault("id", str(uuid.uuid4()))
+        payload["study"] = STUDY_CODE
+
+        remote_saved = False
+        try:
+            _save_questionnaire_remote(payload)
+            remote_saved = True
+        except Exception as exc:
+            print(f"Remote questionnaire save failed: {exc}")
+
+        _save_questionnaire_local(payload)
+
+        return jsonify({
+            "success": True,
+            "message": "Questionnaire saved successfully",
+            "storage": "supabase+local" if remote_saved else "local"
+        }), 200
+    except Exception as exc:
+        print(f"Questionnaire save error: {exc}")
+        return jsonify({"error": str(exc)}), 500
+
+
+@app.route("/api/save_interview", methods=["POST"])
+def save_interview():
+    try:
+        payload = request.get_json(silent=True) or {}
+        if not isinstance(payload, dict):
+            return jsonify({"error": "Invalid interview payload"}), 400
+
+        payload.setdefault("id", str(uuid.uuid4()))
+        payload["study"] = STUDY_CODE
+
+        remote_saved = False
+        try:
+            _save_interview_remote(payload)
+            remote_saved = True
+        except Exception as exc:
+            print(f"Remote interview save failed: {exc}")
+
+        _save_interview_local(payload)
+
+        return jsonify({
+            "success": True,
+            "message": "Interview saved successfully",
+            "storage": "supabase+local" if remote_saved else "local"
+        }), 200
+    except Exception as exc:
+        print(f"Interview save error: {exc}")
+        return jsonify({"error": str(exc)}), 500
+
+
+@app.route("/api/get_surveys", methods=["GET"])
 def get_surveys():
     try:
-        # Fetch all surveys
-        surveys_resp = supabase.table('surveys').select('*').execute()
-        interviews_resp = supabase.table('interviews').select('*').execute()
-
-        all_surveys = surveys_resp.data
-        all_interviews = interviews_resp.data
-
-        # Separate by type for the frontend
-        citizens = [s['payload'] for s in all_surveys if s['type'] == 'customer']
-        employees = [s['payload'] for s in all_surveys if s['type'] == 'employee']
-        
-        # Merge interviews into employee data if needed, or keep separate
-        # The frontend expects 'employee' to contains interview-like data too? 
-        # Actually, interviews are a separate kind of entity.
-        
         return jsonify({
-            'success': True,
-            'customer': citizens,
-            'employee': employees,
-            'interviews': [i['payload'] for i in all_interviews]
+            "success": True,
+            "questionnaire": _load_questionnaires(),
+            "interviews": _load_interviews()
         }), 200
+    except Exception as exc:
+        print(f"Fetch error: {exc}")
+        return jsonify({"error": str(exc)}), 500
 
-    except Exception as e:
-        print(f"Supabase error: {e}")
-        return jsonify({'error': str(e)}), 500
 
-if __name__ == '__main__':
-    print("Starting Virgin Earth Supabase-Backed Server on http://localhost:5000")
-    app.run(host='0.0.0.0', port=5000, debug=True)
+if __name__ == "__main__":
+    print("Starting CNTPP survey server on http://localhost:5000")
+    app.run(host="0.0.0.0", port=5000, debug=True)

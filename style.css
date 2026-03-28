@@ -281,6 +281,25 @@ h3 {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.survey-header h2 {
+    font-size: 1.35em;
+    line-height: 1.4;
+    text-align: center;
+    margin: 0 12px;
+}
+
+.step-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 58px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    font-weight: 700;
+}
+
 /* Survey Sections */
 .survey-section {
     display: none;
@@ -351,6 +370,7 @@ h3 {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     transition: all 0.2s ease;
+    line-height: 1.6;
 }
 
 .day-mode .radio-option span,
@@ -922,6 +942,134 @@ button {
     .sub-title {
         font-size: 1.1em;
     }
+
+    #landing-page {
+        padding-top: 20px;
+    }
+
+    .uni-header {
+        font-size: 0.78em;
+        line-height: 1.8;
+    }
+
+    .hero-panel {
+        padding: 18px 14px;
+    }
+
+    .academic-intro {
+        font-size: 0.98em;
+        padding: 14px;
+    }
+
+    .survey-cards {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    .survey-card {
+        width: 100%;
+        padding: 22px 18px;
+    }
+
+    .survey-header {
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: space-between;
+    }
+
+    .survey-header h2 {
+        order: 3;
+        width: 100%;
+        margin: 0;
+        font-size: 1.15em;
+    }
+
+    .step-indicator {
+        min-width: 52px;
+        font-size: 0.9em;
+    }
+
+    .question-label {
+        font-size: 1em;
+        line-height: 1.8;
+    }
+
+    .radio-group,
+    .checkbox-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .radio-option,
+    .checkbox-option {
+        width: 100%;
+    }
+
+    .radio-option span,
+    .checkbox-option span {
+        width: 100%;
+        padding: 12px 14px;
+    }
+
+    .nav-buttons > button,
+    .btn-copy,
+    .btn-primary,
+    .glow-btn,
+    .btn-prev,
+    .btn-back {
+        width: 100%;
+        text-align: center;
+    }
+
+    .qr-panel {
+        max-width: 100%;
+        margin-top: 14px;
+    }
+
+    .admin-link {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+    }
+
+    .admin-link button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .stats-grid,
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-box {
+        height: 220px;
+    }
+
+    .tabs {
+        flex-direction: column;
+    }
+
+    .tab {
+        width: 100%;
+    }
+
+    .data-table {
+        min-width: 720px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 10px;
+        font-size: 0.88em;
+    }
+
+    .toast {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+    }
 }
 
 /* =====================================================
@@ -1391,4 +1539,214 @@ button {
 .day-mode .radio-group.vertical .radio-option:hover {
     background: rgba(0, 0, 0, 0.06);
     border-color: rgba(0, 0, 0, 0.15);
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.section-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    font-weight: 800;
+    box-shadow: 0 0 18px var(--glow-color);
+}
+
+.section-desc {
+    margin: 0 0 20px;
+    opacity: 0.85;
+    line-height: 1.8;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 14px;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 24px;
+}
+
+.qr-panel {
+    max-width: 260px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 20px;
+}
+
+.btn-copy,
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 30px;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px var(--glow-color);
+}
+
+.thank-you-content {
+    max-width: 640px;
+    margin: 10vh auto 0;
+    padding: 40px;
+    text-align: center;
+}
+
+.admin-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 30px;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.chart-card {
+    padding: 18px;
+}
+
+.chart-card h4 {
+    text-align: center;
+    margin-bottom: 12px;
+    color: var(--primary-color);
+}
+
+.chart-card-wide {
+    grid-column: 1 / -1;
+}
+
+.chart-box {
+    position: relative;
+    height: 280px;
+    width: 100%;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 15px 0;
+}
+
+.tab {
+    padding: 10px 18px;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.08);
+    color: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.tab.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: transparent;
+}
+
+.no-data {
+    text-align: center;
+    padding: 18px;
+}
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1200;
+    padding: 14px 18px;
+}
+
+.toast.success {
+    border-color: rgba(34, 197, 94, 0.5);
+}
+
+.toast.error {
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+.modal-close {
+    background: transparent;
+    color: inherit;
+    font-size: 28px;
+    line-height: 1;
+}
+
+@media (max-width: 768px) {
+    .nav-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .chart-card-wide {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    #content-wrapper {
+        padding: 8px;
+    }
+
+    .hero-panel,
+    .glass-panel,
+    .survey-container,
+    .admin-container,
+    .thank-you-content {
+        padding: 14px 12px;
+        border-radius: 14px;
+    }
+
+    .main-title {
+        font-size: 1.28em;
+    }
+
+    .sub-title {
+        font-size: 1em;
+    }
+
+    .section-number {
+        width: 44px;
+        height: 44px;
+        font-size: 0.95em;
+    }
+
+    .likert-row {
+        padding: 12px;
+    }
+
+    .likert-table .likert-row label {
+        min-width: 44px;
+        padding: 8px 2px;
+    }
+
+    .chart-box {
+        height: 200px;
+    }
+
+    .table-responsive {
+        padding-bottom: 6px;
+    }
 }

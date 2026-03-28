@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+.env
+.playwright-cli/
+data/
+server.pid
+server_stdout.log
+server_stderr.log
