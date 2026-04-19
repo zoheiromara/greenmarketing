@@ -1,109 +1,263 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>منصة الدراسة | التسويق الأخضر والصورة الذهنية</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استبيان التسويق الأخضر - المركز الوطني لتكنولوجيات إنتاج أكثر نقاء</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <div class="page-backdrop" aria-hidden="true"></div>
-  <main class="page-shell">
-    <header class="hero-card">
-      <div class="hero-copy">
-        <p class="eyebrow">CNTPP Research App</p>
-        <h1>الاستبيان ودليل المقابلة</h1>
-        <p class="hero-text">
-          نسخة محدثة لموضوع: دور التسويق الأخضر في تعزيز الصورة الذهنية لدى الجمهور الخارجي
-          للمركز الوطني لتكنولوجيات إنتاج أكثر نقاء.
-        </p>
-      </div>
-      <div class="hero-meta" id="heroMeta">
-        <div class="meta-chip">جاري التحميل...</div>
-      </div>
-    </header>
 
-    <section class="layout-grid">
-      <aside class="sidebar-card">
-        <div class="sidebar-block">
-          <p class="sidebar-label">النطاق</p>
-          <h2>الأداة الميدانية</h2>
-          <p id="studySummary">
-            يتم تحميل النسخة الحالية من الاستبيان والمقابلة وربطهما بنطاق الدراسة.
-          </p>
+<body class="day-mode">
+    <div id="world-container">
+        <canvas id="bg-canvas"></canvas>
+        <div class="sky-gradient"></div>
+        <div class="sun-moon"></div>
+        <div class="forest-bg"></div>
+        <div class="particles"></div>
+
+        <button id="theme-toggle" class="glass-btn">🌙</button>
+
+        <div id="content-wrapper">
+            <div id="landing-page" class="page active">
+                <div class="glass-panel hero-panel">
+                    <div class="uni-header">
+                        <h3>الجمهورية الجزائرية الديمقراطية الشعبية</h3>
+                        <h3>وزارة التعليم العالي والبحث العلمي</h3>
+                        <h3>جامعة البويرة - كلية العلوم الإنسانية والاجتماعية</h3>
+                        <h3>قسم علوم الإعلام والاتصال</h3>
+                    </div>
+
+                    <div class="hero-content">
+                        <h1 class="main-title">دور التسويق الأخضر في تعزيز الصورة الذهنية لدى الجمهور الخارجي</h1>
+                        <h2 class="sub-title">دراسة حالة المركز الوطني لتكنولوجيات إنتاج أكثر نقاء</h2>
+
+                        <div class="academic-intro">
+                            <p>السيد(ة) المحترم(ة)،</p>
+                            <p>في إطار إنجاز هذه الدراسة الأكاديمية، نضع بين أيديكم استمارة الاستبيان ودليل المقابلة
+                                الخاصين ببحث يتناول أثر ممارسات التسويق الأخضر في الصورة الذهنية للمؤسسة.</p>
+                            <p class="note">جميع المعطيات التي تدلون بها تستعمل لأغراض البحث العلمي فقط، مع احترام
+                                السرية الكاملة وعدم توظيف الإجابات خارج هذا الإطار.</p>
+                        </div>
+
+                        <div class="research-info"
+                            style="display: flex; justify-content: space-around; gap: 20px; flex-wrap: wrap; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px;">
+                            <div style="text-align: center;">
+                                <p style="font-weight: 700; color: var(--primary-color); margin-bottom: 5px;">من إعداد
+                                    الطالب(ة):</p>
+                                <p id="student1-name-display"
+                                    style="font-size: 1.1em; font-weight: bold; margin-bottom: 3px;">............</p>
+                                <p id="student2-name-display" style="font-size: 1.1em; font-weight: bold;">............</p>
+                            </div>
+                            <div style="text-align: center;">
+                                <p style="font-weight: 700; color: var(--primary-color); margin-bottom: 5px;">تحت إشراف:</p>
+                                <p id="supervisor-name-display" style="font-size: 1.1em; font-weight: bold;">............</p>
+                            </div>
+                        </div>
+
+                        <div class="survey-cards">
+                            <div class="survey-card glass-card" onclick="startSurvey('questionnaire')">
+                                <div class="card-inner">
+                                    <div class="card-icon">📝</div>
+                                    <h3>الاستبيان</h3>
+                                    <p>موجه إلى الجمهور الخارجي والمتعاملين مع المركز</p>
+                                    <span class="card-badge">شارك برأيك</span>
+                                </div>
+                            </div>
+
+                            <div class="survey-card glass-card" onclick="startSurvey('interview')">
+                                <div class="card-inner">
+                                    <div class="card-icon">🎙️</div>
+                                    <h3>المقابلة</h3>
+                                    <p>أداة مقابلة نصف موجهة للمسؤولين والإطارات</p>
+                                    <span class="card-badge">للباحث</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="admin-link">
+                            <button class="btn-text" onclick="showPasswordModal()">🔐 لوحة التحكم</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel qr-panel">
+                    <h3>شارك الاستبيان</h3>
+                    <div id="qr-code"></div>
+                    <button class="btn-copy" onclick="copyLink()">📋 نسخ الرابط</button>
+                </div>
+            </div>
+
+            <div id="questionnaire-survey" class="page">
+                <div class="glass-panel survey-container">
+                    <div class="progress-bar-container">
+                        <div class="progress-fill" id="questionnaire-progress"></div>
+                    </div>
+
+                    <div class="survey-header">
+                        <button class="btn-back" onclick="showPage('landing-page')">← رجوع</button>
+                        <h2>استمارة الاستبيان</h2>
+                        <span class="step-indicator" id="questionnaire-step">1/1</span>
+                    </div>
+
+                    <div id="questionnaire-form"></div>
+                </div>
+            </div>
+
+            <div id="interview-survey" class="page">
+                <div class="glass-panel survey-container interview-container">
+                    <div class="progress-bar-container">
+                        <div class="progress-fill" id="interview-progress"></div>
+                    </div>
+
+                    <div class="survey-header">
+                        <button class="btn-back" onclick="showPage('landing-page')">← رجوع</button>
+                        <h2>أداة المقابلة نصف الموجهة</h2>
+                        <span class="step-indicator" id="interview-step">1/1</span>
+                    </div>
+
+                    <div id="interview-form"></div>
+                </div>
+            </div>
+
+            <div id="thank-you" class="page">
+                <div class="glass-panel thank-you-content">
+                    <div class="success-icon glow-text">✓</div>
+                    <h2>شكرا على مشاركتكم</h2>
+                    <p>تم تسجيل البيانات بنجاح. يمكنكم العودة إلى الصفحة الرئيسية أو مواصلة العمل من لوحة التحكم.</p>
+                    <button class="btn-primary glow-btn" onclick="showPage('landing-page')">العودة إلى الصفحة الرئيسية</button>
+                </div>
+            </div>
+
+            <div id="admin-page" class="page">
+                <div class="glass-panel admin-container">
+                    <div class="admin-header">
+                        <button class="btn-back" onclick="showPage('landing-page')">← رجوع</button>
+                        <h2>لوحة التحكم</h2>
+                    </div>
+
+                    <div class="admin-settings-section glass-panel" style="margin-bottom: 20px; padding: 20px;">
+                        <h3>إعدادات البحث</h3>
+                        <div class="question-group">
+                            <label class="question-label" for="admin-student-name-1">اسم الطالب(ة) الأول(ى)</label>
+                            <input class="text-input" type="text" id="admin-student-name-1">
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label" for="admin-student-name-2">اسم الطالب(ة) الثاني(ة)</label>
+                            <input class="text-input" type="text" id="admin-student-name-2">
+                        </div>
+                        <div class="question-group">
+                            <label class="question-label" for="admin-supervisor-name">اسم الأستاذ(ة) المشرف(ة)</label>
+                            <input class="text-input" type="text" id="admin-supervisor-name">
+                        </div>
+                        <button class="glow-btn" onclick="saveAdminSettings()">حفظ الإعدادات</button>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card glass-card">
+                            <div class="stat-icon">📝</div>
+                            <div class="stat-number" id="questionnaire-count">0</div>
+                            <div class="stat-label">استمارات الاستبيان</div>
+                        </div>
+                        <div class="stat-card glass-card">
+                            <div class="stat-icon">🎙️</div>
+                            <div class="stat-number" id="interview-count">0</div>
+                            <div class="stat-label">المقابلات المسجلة</div>
+                        </div>
+                    </div>
+
+                    <div class="chart-section">
+                        <h3 style="margin-bottom: 20px;">لوحة المؤشرات</h3>
+                        <div class="charts-grid">
+                            <div class="glass-panel chart-card">
+                                <h4>الفئة العمرية</h4>
+                                <div class="chart-box"><canvas id="chart-age"></canvas></div>
+                            </div>
+                            <div class="glass-panel chart-card">
+                                <h4>طبيعة العلاقة بالمركز</h4>
+                                <div class="chart-box"><canvas id="chart-relation"></canvas></div>
+                            </div>
+                            <div class="glass-panel chart-card">
+                                <h4>نوع الخدمة</h4>
+                                <div class="chart-box"><canvas id="chart-service"></canvas></div>
+                            </div>
+                            <div class="glass-panel chart-card">
+                                <h4>أبعاد التسويق الأخضر</h4>
+                                <div class="chart-box"><canvas id="chart-gm"></canvas></div>
+                            </div>
+                            <div class="glass-panel chart-card">
+                                <h4>أبعاد الصورة الذهنية</h4>
+                                <div class="chart-box"><canvas id="chart-img"></canvas></div>
+                            </div>
+                            <div class="glass-panel chart-card chart-card-wide">
+                                <h4>مؤشر الاتجاه العام</h4>
+                                <div class="chart-box"><canvas id="chart-overall"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="export-section">
+                        <h3>تصدير البيانات</h3>
+                        <div class="export-buttons">
+                            <button class="btn-export glow-btn" onclick="exportData('questionnaire', 'csv')">📊 تصدير الاستبيان CSV</button>
+                            <button class="btn-export glow-btn" onclick="exportData('interviews', 'csv')">📊 تصدير المقابلات CSV</button>
+                            <button class="btn-export secondary" onclick="exportData('questionnaire', 'json')">📁 الاستبيان JSON</button>
+                            <button class="btn-export secondary" onclick="exportData('interviews', 'json')">📁 المقابلات JSON</button>
+                        </div>
+                    </div>
+
+                    <div class="data-preview">
+                        <h3>معاينة البيانات</h3>
+                        <div class="tabs">
+                            <button class="tab active" onclick="showDataTab('questionnaire', event)">الاستبيان</button>
+                            <button class="tab" onclick="showDataTab('interviews', event)">المقابلات</button>
+                        </div>
+                        <div id="data-table-container">
+                            <p class="no-data">لا توجد بيانات بعد</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="sidebar-block" id="statsPanel">
-          <p class="sidebar-label">الإحصاءات</p>
-          <div class="stat-grid">
-            <div class="stat-card">
-              <span class="stat-value" id="statQuestions">--</span>
-              <span class="stat-label">بنود ليكرت</span>
+        <div id="password-modal" class="modal">
+            <div class="glass-panel modal-content">
+                <div class="modal-header">
+                    <h3>تسجيل الدخول للإدارة</h3>
+                    <button class="modal-close" onclick="hidePasswordModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label for="admin-password">أدخل كلمة السر للوصول إلى البيانات</label>
+                    <input class="text-input" type="password" id="admin-password" placeholder="كلمة السر"
+                        onkeypress="handlePasswordEnter(event)">
+                    <p id="password-error" class="error-msg"></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="glow-btn" onclick="checkPassword()">دخول</button>
+                </div>
             </div>
-            <div class="stat-card">
-              <span class="stat-value" id="statInterview">--</span>
-              <span class="stat-label">محاور المقابلة</span>
-            </div>
-          </div>
         </div>
+    </div>
 
-        <div class="sidebar-block" id="downloadPanel">
-          <p class="sidebar-label">التحميل</p>
-          <div class="download-list"></div>
-        </div>
+    <svg style="display: none;">
+        <defs>
+            <filter id="turbulence">
+                <feTurbulence type="fractalNoise" baseFrequency="0.01 0.05" numOctaves="2" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" />
+            </filter>
+        </defs>
+    </svg>
 
-        <div class="sidebar-block progress-block">
-          <p class="sidebar-label">تقدم الإجابة</p>
-          <div class="progress-track">
-            <div class="progress-fill" id="progressFill"></div>
-          </div>
-          <p class="progress-text" id="progressText">0 / 0</p>
-        </div>
-      </aside>
-
-      <section class="main-card">
-        <nav class="tab-strip" aria-label="Tabs">
-          <button class="tab-button is-active" data-tab="survey">الاستبيان</button>
-          <button class="tab-button" data-tab="interview">دليل المقابلة</button>
-        </nav>
-
-        <section class="tab-panel is-active" id="tab-survey">
-          <div class="panel-head">
-            <div>
-              <p class="panel-kicker">Survey</p>
-              <h2 id="surveyTitle">الاستبيان</h2>
-            </div>
-            <div class="panel-note" id="surveyVersion"></div>
-          </div>
-          <p class="panel-intro" id="surveyIntro"></p>
-
-          <form id="surveyForm" novalidate>
-            <div id="surveyMount"></div>
-
-            <div class="submit-row">
-              <button type="submit" class="primary-button">إرسال الاستبيان</button>
-              <p class="form-message" id="formMessage" role="status" aria-live="polite"></p>
-            </div>
-          </form>
-        </section>
-
-        <section class="tab-panel" id="tab-interview">
-          <div class="panel-head">
-            <div>
-              <p class="panel-kicker">Interview Guide</p>
-              <h2 id="interviewTitle">دليل المقابلة</h2>
-            </div>
-            <div class="panel-note" id="interviewVersion"></div>
-          </div>
-          <div id="interviewMount" class="interview-stack"></div>
-        </section>
-      </section>
-    </section>
-  </main>
-
-  <script src="/app.js" defer></script>
+    <script src="app.js"></script>
+    <script src="recorder.js"></script>
+    <script src="background.js"></script>
 </body>
+
 </html>

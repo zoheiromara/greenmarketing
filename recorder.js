@@ -8,20 +8,24 @@
         'fr-FR': 'FR'
     };
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', initializeRecorders);
+
+    function initializeRecorders() {
         document.querySelectorAll('.recorder-box').forEach(box => {
             const questionId = box.id.replace('rec-', '');
-            recorders[questionId] = {
-                transcript: '',
-                recognition: null,
-                isRecording: false,
-                lang: DEFAULT_LANG,
-                timerInterval: null,
-                timerStart: null
-            };
+            if (!recorders[questionId]) {
+                recorders[questionId] = {
+                    transcript: '',
+                    recognition: null,
+                    isRecording: false,
+                    lang: DEFAULT_LANG,
+                    timerInterval: null,
+                    timerStart: null
+                };
+            }
             renderRecorderUI(box, questionId);
         });
-    });
+    }
 
     function renderRecorderUI(container, questionId) {
         container.innerHTML = `
@@ -340,4 +344,5 @@
     window.saveInterview = saveToBackend;
     window._exportInterview = exportInterview;
     window.resetInterviewRecorders = resetInterviewRecorders;
+    window.initializeInterviewRecorders = initializeRecorders;
 })();
