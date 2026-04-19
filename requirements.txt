@@ -1,5 +1,2 @@
-Flask
-flask-cors
-supabase
-gunicorn
-python-dotenv
+# No external runtime dependencies are required.
+# This app runs on the Python standard library WSGI stack.
