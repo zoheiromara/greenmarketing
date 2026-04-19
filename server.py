@@ -93,8 +93,8 @@ LEGACY_INTERVIEW_DIR = LEGACY_DATA_ROOT / "interviews"
 for directory in (QUESTIONNAIRE_DIR, INTERVIEW_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
-SUPABASE_URL = os.getenv("SUPABASE_URL", "https://ppnumoljvvpwtjmsbbuc.supabase.co")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY", "sb_publishable_5Lr6I1qsN0B5hMqBM6cHWQ_bcf8oE1g")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 supabase = None
 if create_client is None:
@@ -104,6 +104,8 @@ elif SUPABASE_URL and SUPABASE_KEY:
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     except Exception as exc:
         print(f"Supabase initialization failed: {exc}")
+else:
+    print("Supabase credentials are not configured; remote storage disabled.")
 
 
 def json_response(start_response, payload: Dict, status: str = "200 OK") -> List[bytes]:

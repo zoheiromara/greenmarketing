@@ -4,5 +4,6 @@ server.pid
 server_stdout.log
 server_stderr.log
 data/questionnaire/*.json
+data/interviews/*.json
 data/citizens/*.json
 ~$*.docx
